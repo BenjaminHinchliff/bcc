@@ -19,8 +19,8 @@ if(NOT Catch2_FOUND)
 endif()
 
 set(TEST_SRCS
-	"hello_test.cpp")
-
+	"lexer_test.cpp")
+	
 add_executable(tcc_tests ${TEST_SRCS})
 
 target_link_libraries(tcc_tests PUBLIC libtcc)

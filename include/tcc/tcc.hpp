@@ -1,6 +1,6 @@
-﻿#ifndef TCC_HPP
-#define TCC_HPP
+﻿#ifndef TCC_TCC_HPP
+#define TCC_TCC_HPP
 
-#include "hello.hpp"
+#include "lexer.hpp"
 
-#endif // !TCC_HPP
+#endif // !TCC_TCC_HPP
