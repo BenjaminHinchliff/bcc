@@ -20,7 +20,8 @@ endif()
 
 set(TEST_SRCS
 	"lexer_test.cpp"
-	"parser_test.cpp")
+	"parser_test.cpp"
+	"codegen_test.cpp")
 	
 add_executable(tcc_tests ${TEST_SRCS})
 

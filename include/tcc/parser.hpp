@@ -11,10 +11,7 @@
 
 namespace tcc {
 namespace parser {
-
-using ast::Program;
-
-Program parse(const lexer::Tokens &tokens);
+ast::Program parse(const lexer::Tokens &tokens);
 } // namespace parser
 } // namespace tcc
 

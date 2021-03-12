@@ -13,7 +13,6 @@ int main() {
 )#"};
     auto tokens = tcc::lexer::lex(source);
     auto ast = tcc::parser::parse(tokens);
-    std::cout << ast << '\n';
     Program target{"main", Stmt{Return{Constant{2}}}};
     REQUIRE(ast == target);
   }
