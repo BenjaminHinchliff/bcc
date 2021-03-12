@@ -5,22 +5,31 @@ namespace parser {
 using namespace lexer::tokens;
 using namespace ast;
 using namespace exceptions;
+
+namespace exceptions {
+UnexpectedToken::UnexpectedToken(const Token &given, const Token &expected)
+    : given(given), expected(expected), message("Unexpected Token") {}
+
+const char *UnexpectedToken::what() const noexcept { return "asdf"; }
+} // namespace exceptions
+
 Expr parseExpr(lexer::Tokens::const_iterator &it) {
   if (!std::holds_alternative<Literal>(*it)) {
-    throw UnexpectedToken{};
+    throw UnexpectedToken(*it, Literal{});
   }
   const Literal &lit = std::get<Literal>(*it++);
   if (!std::holds_alternative<literals::Int>(lit)) {
-    throw UnexpectedToken{};
+    throw UnexpectedToken(lit, literals::Int{});
   }
   int val = std::get<literals::Int>(lit).value;
   return Constant{val};
 }
 
 Stmt parseStmt(lexer::Tokens::const_iterator &it) {
-  if (*it++ != Token(Keyword::RETURN)) {
-    throw UnexpectedToken{};
+  if (*it != Token(Keyword::RETURN)) {
+    throw UnexpectedToken(*it, Keyword::RETURN);
   }
+  ++it;
   Expr expr = parseExpr(it);
   // consume semicolon
   ++it;

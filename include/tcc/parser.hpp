@@ -14,7 +14,15 @@ namespace tcc {
 namespace parser {
 namespace exceptions {
 struct UnexpectedToken : public std::exception {
-  const char *what() const noexcept { return "Unexpected Token"; }
+public:
+  UnexpectedToken(const lexer::Token &given, const lexer::Token &expected);
+
+  const char *what() const noexcept;
+
+private:
+  lexer::Token given;
+  lexer::Token expected;
+  std::string message;
 };
 } // namespace exceptions
 
