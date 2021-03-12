@@ -10,7 +10,7 @@ using namespace lexer::tokens;
 const std::unordered_map<std::string, Keyword> stringToKeyword{
     {"int", Keyword::INT}, {"return", Keyword::RETURN}};
 
-std::vector<Token> lex(const std::string &source) {
+Tokens lex(const std::string &source) {
 
   std::vector<Token> tokens;
   for (auto it = source.cbegin(); it != source.cend(); ++it) {

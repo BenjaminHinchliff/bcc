@@ -19,7 +19,8 @@ if(NOT Catch2_FOUND)
 endif()
 
 set(TEST_SRCS
-	"lexer_test.cpp")
+	"lexer_test.cpp"
+	"parser_test.cpp")
 	
 add_executable(tcc_tests ${TEST_SRCS})
 

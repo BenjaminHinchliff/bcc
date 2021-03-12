@@ -10,6 +10,7 @@ namespace lexer {
 namespace tokens {
 template <typename T> struct InheritedEquality {
   constexpr bool operator==(const T &) const { return true; }
+  constexpr bool operator!=(const T &other) const { return !(*this == other); }
 };
 
 struct OpenBrace : InheritedEquality<OpenBrace> {};
@@ -24,6 +25,7 @@ struct Identifier {
   std::string name;
 
   bool operator==(const Identifier &other) const { return name == other.name; }
+  bool operator!=(const Identifier &other) const { return !(*this == other); }
 };
 
 namespace literals {
@@ -31,6 +33,7 @@ struct Int {
   int value;
 
   bool operator==(const Int &other) const { return value == other.value; }
+  bool operator!=(const Int &other) const { return !(*this == other); }
 };
 
 } // namespace literals
@@ -43,8 +46,9 @@ using Token = std::variant<OpenBrace, CloseBrace, OpenParen, CloseParen,
 } // namespace tokens
 
 using tokens::Token;
+using Tokens = std::vector<Token>;
 
-std::vector<Token> lex(const std::string &source);
+Tokens lex(const std::string &source);
 } // namespace lexer
 } // namespace tcc
 
