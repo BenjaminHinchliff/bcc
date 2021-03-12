@@ -6,13 +6,15 @@ set(TCC_HDRS_PREFIX
 set(TCC_HDRS
 	"tcc/tcc.hpp"
 	"tcc/lexer.hpp"
-	"tcc/parser.hpp")
+	"tcc/parser.hpp"
+	"tcc/ast.hpp")
 
 list(TRANSFORM TCC_HDRS PREPEND ${TCC_HDRS_PREFIX})
 
 set(TCC_SRCS
 	"lexer.cpp"
-	"parser.cpp")
+	"parser.cpp"
+	"ast.cpp")
 
 add_library(libtcc ${TCC_HDRS} ${TCC_SRCS})
 target_include_directories(libtcc PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/${TCC_HDRS_PREFIX}")
