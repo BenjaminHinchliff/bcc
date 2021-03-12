@@ -4,13 +4,14 @@ namespace tcc {
 namespace parser {
 using namespace lexer::tokens;
 using namespace ast;
+using namespace exceptions;
 Expr parseExpr(lexer::Tokens::const_iterator &it) {
   if (!std::holds_alternative<Literal>(*it)) {
-    throw "expected literal in return";
+    throw UnexpectedToken{};
   }
   const Literal &lit = std::get<Literal>(*it++);
   if (!std::holds_alternative<literals::Int>(lit)) {
-    throw "expected int as return literal";
+    throw UnexpectedToken{};
   }
   int val = std::get<literals::Int>(lit).value;
   return Constant{val};
@@ -18,7 +19,7 @@ Expr parseExpr(lexer::Tokens::const_iterator &it) {
 
 Stmt parseStmt(lexer::Tokens::const_iterator &it) {
   if (*it++ != Token(Keyword::RETURN)) {
-    throw "error stuff";
+    throw UnexpectedToken{};
   }
   Expr expr = parseExpr(it);
   // consume semicolon

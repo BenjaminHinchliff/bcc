@@ -18,7 +18,15 @@ int main(int argc, char **argv) {
   std::stringstream inputStrStream;
   inputStrStream << inputFile.rdbuf();
   auto tokens = tcc::lexer::lex(inputStrStream.str());
-  auto program = tcc::parser::parse(tokens);
+
+  tcc::ast::Program program;
+  try {
+program =  tcc::parser::parse(tokens);
+  } catch (const tcc::parser::exceptions::UnexpectedToken &e) {
+    std::cerr << "Parsing error:\n";
+    std::cerr << '\t' << e.what() << '\n';
+    return 1;
+  }
 
   std::ofstream outputFile(outputPath);
   tcc::codegen::codegen(outputFile, program);
