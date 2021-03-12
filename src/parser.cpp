@@ -2,7 +2,7 @@
 
 namespace tcc {
 namespace parser {
-using namespace lexer::tokens;
+using namespace tokens;
 using namespace ast;
 using namespace exceptions;
 

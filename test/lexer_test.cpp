@@ -11,7 +11,7 @@ int main() {
 }
 )#"};
     auto tokens = tcc::lexer::lex(source);
-    using namespace tcc::lexer::tokens;
+    using namespace tcc::tokens;
     std::vector<Token> target{
         Keyword::INT,     Identifier{"main"}, OpenParen{},
         CloseParen{},     OpenBrace{},        Keyword::RETURN,
