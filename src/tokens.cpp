@@ -49,6 +49,23 @@ std::ostream &operator<<(std::ostream &out, const TypeKeyword &tok) {
   return out;
 }
 
+std::ostream &operator<<(std::ostream &out, const UnaryOperator &tok) {
+  switch (tok) {
+  case UnaryOperator::NEGATION:
+    out << "NEGATION";
+    break;
+  case UnaryOperator::BITWISE_COMPLEMENT:
+    out << "BITWISE_COMPLEMENT";
+    break;
+  case UnaryOperator::LOGICAL_NEGATION:
+    out << "LOGICAL_NEGATION";
+    break;
+  default:
+    throw std::runtime_error("unknown keyword");
+  }
+  return out;
+}
+
 bool Identifier::operator==(const Identifier &other) const {
   return name == other.name;
 }

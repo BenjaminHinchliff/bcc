@@ -10,6 +10,11 @@ using namespace tokens;
 const std::unordered_map<std::string, Token> stringToKeyword{
     {"int", TypeKeyword::INT}, {"return", Keyword::RETURN}};
 
+const std::unordered_map<char, UnaryOperator> charToUnary{
+    {'-', UnaryOperator::NEGATION},
+    {'~', UnaryOperator::BITWISE_COMPLEMENT},
+    {'!', UnaryOperator::LOGICAL_NEGATION}};
+
 Tokens lex(const std::string &source) {
 
   std::vector<Token> tokens;
@@ -43,6 +48,13 @@ Tokens lex(const std::string &source) {
         letter = *(++it);
       } while (std::isdigit(letter));
       tokens.emplace_back(literals::Int{value});
+    }
+
+    // unary operators
+    auto unary_it = charToUnary.find(letter);
+    if (unary_it != charToUnary.end()) {
+      tokens.emplace_back(unary_it->second);
+      continue;
     }
 
     // single character tokens
