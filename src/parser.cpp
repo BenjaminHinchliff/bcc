@@ -2,21 +2,19 @@
 
 namespace tcc {
 namespace parser {
-using namespace tokens;
 using namespace ast;
-using namespace exceptions;
-
 namespace exceptions {
 
 const char *ParserException::what() const noexcept { return message.c_str(); }
 
-UnexpectedToken::UnexpectedToken(const Token &given, const Token &expected) {
+UnexpectedToken::UnexpectedToken(const tokens::Token &given,
+                                 const tokens::Token &expected) {
   std::stringstream msgStream;
   msgStream << "unexpected token given: " << given << " expected: " << expected;
   message = msgStream.str();
 }
 
-UnexpectedEOF::UnexpectedEOF(const Token &expected) {
+UnexpectedEOF::UnexpectedEOF(const tokens::Token &expected) {
   std::stringstream msgStream;
   msgStream << "unexpected EOF - expected: " << expected;
   message = msgStream.str();
@@ -24,7 +22,10 @@ UnexpectedEOF::UnexpectedEOF(const Token &expected) {
 
 } // namespace exceptions
 
-void ensureToken(Tokens::const_iterator &it, const Tokens::const_iterator &end, const Token &target) {
+using namespace exceptions;
+
+void ensureToken(Tokens::const_iterator &it, const Tokens::const_iterator &end,
+                 const tokens::Token &target) {
   if (it == end) {
     throw UnexpectedEOF(target);
   }
@@ -35,39 +36,40 @@ void ensureToken(Tokens::const_iterator &it, const Tokens::const_iterator &end, 
 }
 
 Expr parseExpr(Tokens::const_iterator &it) {
-  if (!std::holds_alternative<Literal>(*it)) {
-    throw UnexpectedToken(*it, Literal{});
+  if (!std::holds_alternative<tokens::Literal>(*it)) {
+    throw UnexpectedToken(*it, tokens::Literal{});
   }
-  const Literal &lit = std::get<Literal>(*it++);
-  if (!std::holds_alternative<literals::Int>(lit)) {
-    throw UnexpectedToken(lit, literals::Int{});
+  const auto &lit = std::get<tokens::Literal>(*it++);
+  if (!std::holds_alternative<tokens::literals::Int>(lit)) {
+    throw UnexpectedToken(lit, tokens::literals::Int{});
   }
-  int val = std::get<literals::Int>(lit).value;
+  int val = std::get<tokens::literals::Int>(lit).value;
   return Constant{val};
 }
 
 Stmt parseStmt(Tokens::const_iterator &it, const Tokens::const_iterator &end) {
-  ensureToken(it, end, Token(Keyword::RETURN));
+  ensureToken(it, end, tokens::Token(tokens::Keyword::RETURN));
   Expr expr = parseExpr(it);
   // consume semicolon
-  ensureToken(it, end, Semicolon{});
+  ensureToken(it, end, tokens::Semicolon{});
   return Return{expr};
 }
 
-Function parseFunction(Tokens::const_iterator &it, const Tokens::const_iterator &end) {
+Function parseFunction(Tokens::const_iterator &it,
+                       const Tokens::const_iterator &end) {
   // type keyword
-  if (!std::holds_alternative<TypeKeyword>(*it)) {
-    throw UnexpectedToken(*it, Token(TypeKeyword::INT));
+  if (!std::holds_alternative<tokens::TypeKeyword>(*it)) {
+    throw UnexpectedToken(*it, tokens::Token(tokens::TypeKeyword::INT));
   }
   ++it;
-  const std::string &name = std::get<Identifier>(*it++).name;
+  const std::string &name = std::get<tokens::Identifier>(*it++).name;
   // args
-  ensureToken(it, end, OpenParen{});
-  ensureToken(it, end, CloseParen{});
+  ensureToken(it, end, tokens::OpenParen{});
+  ensureToken(it, end, tokens::CloseParen{});
   // body
-  ensureToken(it, end, OpenBrace{});
+  ensureToken(it, end, tokens::OpenBrace{});
   Stmt body = parseStmt(it, end);
-  ensureToken(it, end, CloseBrace{});
+  ensureToken(it, end, tokens::CloseBrace{});
   return Function{name, body};
 }
 
