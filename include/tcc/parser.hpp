@@ -15,18 +15,18 @@ namespace parser {
 namespace exceptions {
 struct UnexpectedToken : public std::exception {
 public:
-  UnexpectedToken(const lexer::Token &given, const lexer::Token &expected);
+  UnexpectedToken(const tokens::Token &given, const tokens::Token &expected);
 
   const char *what() const noexcept;
 
 private:
-  lexer::Token given;
-  lexer::Token expected;
+  tokens::Token given;
+  tokens::Token expected;
   std::string message;
 };
 } // namespace exceptions
 
-ast::Program parse(const lexer::Tokens &tokens);
+ast::Program parse(const Tokens &tokens);
 } // namespace parser
 } // namespace tcc
 

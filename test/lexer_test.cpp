@@ -17,7 +17,6 @@ int main() {
         CloseParen{},     OpenBrace{},        Keyword::RETURN,
         literals::Int{2}, Semicolon{},        CloseBrace{},
     };
-    //std::cout << tokens << '\n';
     REQUIRE(tokens == target);
   }
 }

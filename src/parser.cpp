@@ -13,7 +13,7 @@ UnexpectedToken::UnexpectedToken(const Token &given, const Token &expected)
 const char *UnexpectedToken::what() const noexcept { return "asdf"; }
 } // namespace exceptions
 
-Expr parseExpr(lexer::Tokens::const_iterator &it) {
+Expr parseExpr(Tokens::const_iterator &it) {
   if (!std::holds_alternative<Literal>(*it)) {
     throw UnexpectedToken(*it, Literal{});
   }
@@ -25,7 +25,7 @@ Expr parseExpr(lexer::Tokens::const_iterator &it) {
   return Constant{val};
 }
 
-Stmt parseStmt(lexer::Tokens::const_iterator &it) {
+Stmt parseStmt(Tokens::const_iterator &it) {
   if (*it != Token(Keyword::RETURN)) {
     throw UnexpectedToken(*it, Keyword::RETURN);
   }
@@ -36,7 +36,7 @@ Stmt parseStmt(lexer::Tokens::const_iterator &it) {
   return Return{expr};
 }
 
-Function parseFunction(lexer::Tokens::const_iterator &it) {
+Function parseFunction(Tokens::const_iterator &it) {
   // type keyword
   ++it;
   const std::string &name = std::get<Identifier>(*it++).name;
@@ -52,8 +52,8 @@ Function parseFunction(lexer::Tokens::const_iterator &it) {
 }
 
 // TODO: error handling
-Program parse(const lexer::Tokens &tokens) {
-  lexer::Tokens::const_iterator it = tokens.cbegin();
+Program parse(const Tokens &tokens) {
+  Tokens::const_iterator it = tokens.cbegin();
   Function func = parseFunction(it);
   assert(it == tokens.cend() && "unexpected tokens at end of source");
   return func;

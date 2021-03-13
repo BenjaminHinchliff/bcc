@@ -9,10 +9,6 @@
 
 namespace tcc {
 namespace lexer {
-
-using tokens::Token;
-using Tokens = std::vector<Token>;
-
 Tokens lex(const std::string &source);
 } // namespace lexer
 } // namespace tcc
