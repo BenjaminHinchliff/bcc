@@ -22,12 +22,13 @@ set(TEST_SRCS
 	"lexer_test.cpp"
 	"parser_test.cpp"
 	"codegen_test.cpp")
-	
-add_executable(tcc_tests ${TEST_SRCS})
 
-target_link_libraries(tcc_tests PUBLIC libtcc)
-target_link_libraries(tcc_tests PUBLIC Catch2::Catch2 Catch2::Catch2WithMain)
+set(TESTS_NAME "${PROJECT_NAME}_tests")	
+add_executable(${TESTS_NAME} ${TEST_SRCS})
+
+target_link_libraries(${TESTS_NAME} PUBLIC libtcc)
+target_link_libraries(${TESTS_NAME} PUBLIC Catch2::Catch2 Catch2::Catch2WithMain)
 
 include(CTest)
 include(Catch)
-catch_discover_tests(tcc_tests)
+catch_discover_tests(${TESTS_NAME})
