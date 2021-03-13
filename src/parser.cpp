@@ -8,9 +8,14 @@ using namespace exceptions;
 
 namespace exceptions {
 UnexpectedToken::UnexpectedToken(const Token &given, const Token &expected)
-    : given(given), expected(expected), message("Unexpected Token") {}
+    : given(given), expected(expected) {
+  std::stringstream msgStream;
+  msgStream << "unexpected token given: " << this->given
+            << "expected: " << this->expected;
+  message = msgStream.str();
+}
 
-const char *UnexpectedToken::what() const noexcept { return "asdf"; }
+const char *UnexpectedToken::what() const noexcept { return message.c_str(); }
 } // namespace exceptions
 
 Expr parseExpr(Tokens::const_iterator &it) {
@@ -32,6 +37,9 @@ Stmt parseStmt(Tokens::const_iterator &it) {
   ++it;
   Expr expr = parseExpr(it);
   // consume semicolon
+  if (*it != Token(Semicolon{})) {
+    throw UnexpectedToken(*it, Semicolon{});
+  }
   ++it;
   return Return{expr};
 }
@@ -41,11 +49,26 @@ Function parseFunction(Tokens::const_iterator &it) {
   ++it;
   const std::string &name = std::get<Identifier>(*it++).name;
   // args
-  it += 2;
+  // open paren
+  if (*it != Token(OpenParen{})) {
+    throw UnexpectedToken(*it, OpenParen{});
+  }
+  ++it;
+  // close paren
+  if (*it != Token(CloseParen{})) {
+    throw UnexpectedToken(*it, CloseParen{});
+  }
+  ++it;
   // open brace
+  if (*it != Token(OpenBrace{})) {
+    throw UnexpectedToken(*it, OpenBrace{});
+  }
   ++it;
   Stmt body = parseStmt(it);
   // close brace
+  if (*it != Token(CloseBrace{})) {
+    throw UnexpectedToken(*it, CloseBrace{});
+  }
   ++it;
 
   return Function{name, body};
