@@ -3,10 +3,10 @@
 
 #include <cassert>
 #include <ostream>
+#include <sstream>
 #include <stdexcept>
 #include <string>
 #include <variant>
-#include <sstream>
 
 #include "ast.hpp"
 #include "lexer.hpp"
@@ -14,18 +14,26 @@
 namespace tcc {
 namespace parser {
 namespace exceptions {
-struct UnexpectedToken : public std::exception {
-public:
-  UnexpectedToken(const tokens::Token &given, const tokens::Token &expected);
+class ParserException : public std::exception {
 
   const char *what() const noexcept;
 
-private:
-  tokens::Token given;
-  tokens::Token expected;
+protected:
   std::string message;
 };
+
+class UnexpectedToken : public ParserException {
+public:
+  UnexpectedToken(const tokens::Token &given, const tokens::Token &expected);
+};
+
+class UnexpectedEOF : public ParserException {
+public:
+  UnexpectedEOF(const tokens::Token &expected);
+};
 } // namespace exceptions
+
+using Exception = exceptions::ParserException;
 
 ast::Program parseTokens(const Tokens &tokens);
 

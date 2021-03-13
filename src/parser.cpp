@@ -7,21 +7,31 @@ using namespace ast;
 using namespace exceptions;
 
 namespace exceptions {
-UnexpectedToken::UnexpectedToken(const Token &given, const Token &expected)
-    : given(given), expected(expected) {
+
+const char *ParserException::what() const noexcept { return message.c_str(); }
+
+UnexpectedToken::UnexpectedToken(const Token &given, const Token &expected) {
   std::stringstream msgStream;
-  msgStream << "unexpected token given: " << this->given
-            << " expected: " << this->expected;
+  msgStream << "unexpected token given: " << given << " expected: " << expected;
   message = msgStream.str();
 }
 
-const char *UnexpectedToken::what() const noexcept { return message.c_str(); }
+UnexpectedEOF::UnexpectedEOF(const Token &expected) {
+  std::stringstream msgStream;
+  msgStream << "unexpected EOF - expected: " << expected;
+  message = msgStream.str();
+}
+
 } // namespace exceptions
 
-void ensureToken(const Token &cur, const Token &target) {
-  if (cur != target) {
-    throw UnexpectedToken(cur, target);
+void ensureToken(Tokens::const_iterator &it, const Tokens::const_iterator &end, const Token &target) {
+  if (it == end) {
+    throw UnexpectedEOF(target);
   }
+  if (*it != target) {
+    throw UnexpectedToken(*it, target);
+  }
+  ++it;
 }
 
 Expr parseExpr(Tokens::const_iterator &it) {
@@ -36,15 +46,15 @@ Expr parseExpr(Tokens::const_iterator &it) {
   return Constant{val};
 }
 
-Stmt parseStmt(Tokens::const_iterator &it) {
-  ensureToken(*it++, Token(Keyword::RETURN));
+Stmt parseStmt(Tokens::const_iterator &it, const Tokens::const_iterator &end) {
+  ensureToken(it, end, Token(Keyword::RETURN));
   Expr expr = parseExpr(it);
   // consume semicolon
-  ensureToken(*it++, Semicolon{});
+  ensureToken(it, end, Semicolon{});
   return Return{expr};
 }
 
-Function parseFunction(Tokens::const_iterator &it) {
+Function parseFunction(Tokens::const_iterator &it, const Tokens::const_iterator &end) {
   // type keyword
   if (!std::holds_alternative<TypeKeyword>(*it)) {
     throw UnexpectedToken(*it, Token(TypeKeyword::INT));
@@ -52,22 +62,23 @@ Function parseFunction(Tokens::const_iterator &it) {
   ++it;
   const std::string &name = std::get<Identifier>(*it++).name;
   // args
-  ensureToken(*it++, OpenParen{}); 
-  ensureToken(*it++, CloseParen{}); 
+  ensureToken(it, end, OpenParen{});
+  ensureToken(it, end, CloseParen{});
   // body
-  ensureToken(*it++, OpenBrace{});
-  Stmt body = parseStmt(it);
-  ensureToken(*it++, CloseBrace{});
+  ensureToken(it, end, OpenBrace{});
+  Stmt body = parseStmt(it, end);
+  ensureToken(it, end, CloseBrace{});
   return Function{name, body};
 }
 
 Program parseTokens(const Tokens &tokens) {
-  Tokens::const_iterator it = tokens.cbegin();
-  Function func = parseFunction(it);
+  auto it = tokens.cbegin();
+  auto end = tokens.cend();
+  Function func = parseFunction(it, end);
   return func;
 }
 
-ast::Program parse(const std::string& source) {
+ast::Program parse(const std::string &source) {
   const Tokens tokens = lexer::lex(source);
   return parseTokens(tokens);
 }
