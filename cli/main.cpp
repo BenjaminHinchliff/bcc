@@ -22,7 +22,7 @@ int main(int argc, char **argv) {
   tcc::ast::Program program;
   try {
 program =  tcc::parser::parseTokens(tokens);
-  } catch (const tcc::parser::exceptions::UnexpectedToken &e) {
+  } catch (const tcc::parser::Exception &e) {
     std::cerr << "Parsing error:\n";
     std::cerr << '\t' << e.what() << '\n';
     return 1;

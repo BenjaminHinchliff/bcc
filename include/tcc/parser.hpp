@@ -15,7 +15,7 @@ namespace tcc {
 namespace parser {
 namespace exceptions {
 class ParserException : public std::exception {
-
+public:
   const char *what() const noexcept;
 
 protected:
