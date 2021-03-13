@@ -27,7 +27,9 @@ private:
 };
 } // namespace exceptions
 
-ast::Program parse(const Tokens &tokens);
+ast::Program parseTokens(const Tokens &tokens);
+
+ast::Program parse(const std::string &source);
 } // namespace parser
 } // namespace tcc
 

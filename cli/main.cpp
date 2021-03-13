@@ -21,7 +21,7 @@ int main(int argc, char **argv) {
 
   tcc::ast::Program program;
   try {
-program =  tcc::parser::parse(tokens);
+program =  tcc::parser::parseTokens(tokens);
   } catch (const tcc::parser::exceptions::UnexpectedToken &e) {
     std::cerr << "Parsing error:\n";
     std::cerr << '\t' << e.what() << '\n';

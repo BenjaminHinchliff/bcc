@@ -61,11 +61,15 @@ Function parseFunction(Tokens::const_iterator &it) {
   return Function{name, body};
 }
 
-Program parse(const Tokens &tokens) {
+Program parseTokens(const Tokens &tokens) {
   Tokens::const_iterator it = tokens.cbegin();
   Function func = parseFunction(it);
-  assert(it == tokens.cend() && "unexpected tokens at end of source");
   return func;
+}
+
+ast::Program parse(const std::string& source) {
+  const Tokens tokens = lexer::lex(source);
+  return parseTokens(tokens);
 }
 } // namespace parser
 } // namespace tcc

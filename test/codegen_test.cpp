@@ -9,8 +9,7 @@ int main() {
     return 2;
 }
 )#"};
-  auto tokens = tcc::lexer::lex(source);
-  auto ast = tcc::parser::parse(tokens);
+  auto ast = tcc::parser::parse(source);
   std::stringstream ss;
   tcc::codegen::codegen(ss, ast);
   std::string target(
