@@ -11,12 +11,18 @@ UnexpectedToken::UnexpectedToken(const Token &given, const Token &expected)
     : given(given), expected(expected) {
   std::stringstream msgStream;
   msgStream << "unexpected token given: " << this->given
-            << "expected: " << this->expected;
+            << " expected: " << this->expected;
   message = msgStream.str();
 }
 
 const char *UnexpectedToken::what() const noexcept { return message.c_str(); }
 } // namespace exceptions
+
+void ensureToken(const Token &cur, const Token &target) {
+  if (cur != target) {
+    throw UnexpectedToken(cur, target);
+  }
+}
 
 Expr parseExpr(Tokens::const_iterator &it) {
   if (!std::holds_alternative<Literal>(*it)) {
@@ -31,50 +37,30 @@ Expr parseExpr(Tokens::const_iterator &it) {
 }
 
 Stmt parseStmt(Tokens::const_iterator &it) {
-  if (*it != Token(Keyword::RETURN)) {
-    throw UnexpectedToken(*it, Keyword::RETURN);
-  }
-  ++it;
+  ensureToken(*it++, Token(Keyword::RETURN));
   Expr expr = parseExpr(it);
   // consume semicolon
-  if (*it != Token(Semicolon{})) {
-    throw UnexpectedToken(*it, Semicolon{});
-  }
-  ++it;
+  ensureToken(*it++, Semicolon{});
   return Return{expr};
 }
 
 Function parseFunction(Tokens::const_iterator &it) {
   // type keyword
+  if (!std::holds_alternative<TypeKeyword>(*it)) {
+    throw UnexpectedToken(*it, Token(TypeKeyword::INT));
+  }
   ++it;
   const std::string &name = std::get<Identifier>(*it++).name;
   // args
-  // open paren
-  if (*it != Token(OpenParen{})) {
-    throw UnexpectedToken(*it, OpenParen{});
-  }
-  ++it;
-  // close paren
-  if (*it != Token(CloseParen{})) {
-    throw UnexpectedToken(*it, CloseParen{});
-  }
-  ++it;
-  // open brace
-  if (*it != Token(OpenBrace{})) {
-    throw UnexpectedToken(*it, OpenBrace{});
-  }
-  ++it;
+  ensureToken(*it++, OpenParen{}); 
+  ensureToken(*it++, CloseParen{}); 
+  // body
+  ensureToken(*it++, OpenBrace{});
   Stmt body = parseStmt(it);
-  // close brace
-  if (*it != Token(CloseBrace{})) {
-    throw UnexpectedToken(*it, CloseBrace{});
-  }
-  ++it;
-
+  ensureToken(*it++, CloseBrace{});
   return Function{name, body};
 }
 
-// TODO: error handling
 Program parse(const Tokens &tokens) {
   Tokens::const_iterator it = tokens.cbegin();
   Function func = parseFunction(it);

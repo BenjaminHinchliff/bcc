@@ -7,8 +7,8 @@ namespace tcc {
 namespace lexer {
 using namespace tokens;
 
-const std::unordered_map<std::string, Keyword> stringToKeyword{
-    {"int", Keyword::INT}, {"return", Keyword::RETURN}};
+const std::unordered_map<std::string, Token> stringToKeyword{
+    {"int", TypeKeyword::INT}, {"return", Keyword::RETURN}};
 
 Tokens lex(const std::string &source) {
 

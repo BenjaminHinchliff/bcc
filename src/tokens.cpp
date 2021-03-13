@@ -29,14 +29,22 @@ std::ostream &operator<<(std::ostream &out, const Semicolon &) {
 
 std::ostream &operator<<(std::ostream &out, const Keyword &tok) {
   switch (tok) {
-  case Keyword::INT:
-    out << "INT";
-    break;
   case Keyword::RETURN:
     out << "RETURN";
     break;
   default:
-    throw std::runtime_error("unknown keywork");
+    throw std::runtime_error("unknown keyword");
+  }
+  return out;
+}
+
+std::ostream &operator<<(std::ostream &out, const TypeKeyword &tok) {
+  switch (tok) {
+  case TypeKeyword::INT:
+    out << "INT";
+    break;
+  default:
+    throw std::runtime_error("unknown keyword");
   }
   return out;
 }

@@ -28,8 +28,11 @@ std::ostream &operator<<(std::ostream &out, const CloseParen &);
 struct Semicolon : InheritedEquality<Semicolon> {};
 std::ostream &operator<<(std::ostream &out, const Semicolon &);
 
-enum class Keyword { INT, RETURN };
+enum class Keyword { RETURN };
 std::ostream &operator<<(std::ostream &out, const Keyword &tok);
+
+enum class TypeKeyword { INT };
+std::ostream &operator<<(std::ostream &out, const TypeKeyword &tok);
 
 struct Identifier {
   std::string name;
@@ -53,8 +56,9 @@ using Literal = std::variant<literals::Int>;
 
 std::ostream &operator<<(std::ostream &out, const Literal &lit);
 
-using Token = std::variant<OpenBrace, CloseBrace, OpenParen, CloseParen,
-                           Semicolon, Keyword, Identifier, Literal>;
+using Token =
+    std::variant<OpenBrace, CloseBrace, OpenParen, CloseParen, Semicolon,
+                 Keyword, TypeKeyword, Identifier, Literal>;
 
 std::ostream &operator<<(std::ostream &out, const Token &tok);
 
