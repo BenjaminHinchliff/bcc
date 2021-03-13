@@ -13,6 +13,9 @@ int main() {
   std::stringstream ss;
   tcc::codegen::codegen(ss, ast);
   std::string target(
-      "\n\t.def\tmain;\n\t.globl\tmain\nmain:\n\tmovl\t$2, %eax\n\tretq\n");
-  REQUIRE(("\n" + ss.str()) == target);
+      "\t.globl\tmain\nmain:\n\tmovl\t$2, %eax\n\tretq\n");
+#ifdef _WIN32
+  target.insert(0, "\t.def\tmain;\n");
+#endif // _WIN32
+  REQUIRE(ss.str() == target);
 }
