@@ -3,7 +3,7 @@
 #include <iostream>
 #include <sstream>
 
-#include <tcc/tcc.hpp>
+#include <bcc/bcc.hpp>
 
 int main(int argc, char **argv) {
   if (argc < 2) {
@@ -18,19 +18,19 @@ int main(int argc, char **argv) {
   std::ifstream inputFile(inputPath);
   std::stringstream inputStrStream;
   inputStrStream << inputFile.rdbuf();
-  auto tokens = tcc::lexer::lex(inputStrStream.str());
+  auto tokens = bcc::lexer::lex(inputStrStream.str());
 
-  tcc::ast::Program program;
+  bcc::ast::Program program;
   try {
-    program = tcc::parser::parseTokens(tokens);
-  } catch (const tcc::parser::Exception &e) {
+    program = bcc::parser::parseTokens(tokens);
+  } catch (const bcc::parser::Exception &e) {
     std::cerr << "Parsing error:\n";
     std::cerr << '\t' << e.what() << '\n';
     return 1;
   }
 
   std::ofstream outputFile(outputPath);
-  tcc::codegen::codegen(outputFile, program);
+  bcc::codegen::codegen(outputFile, program);
   outputFile.close();
 
 #ifdef _WIN32

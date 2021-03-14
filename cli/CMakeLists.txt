@@ -6,4 +6,4 @@ set(CLI_SRCS
 set(CLI_NAME ${PROJECT_NAME})
 add_executable(${CLI_NAME} ${CLI_SRCS})
 
-target_link_libraries(${CLI_NAME} PUBLIC libtcc)
+target_link_libraries(${CLI_NAME} PUBLIC libbcc)
