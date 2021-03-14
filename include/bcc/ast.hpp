@@ -1,11 +1,11 @@
-#ifndef TCC_AST_HPP
-#define TCC_AST_HPP
+#ifndef BCC_AST_HPP
+#define BCC_AST_HPP
 
+#include <memory>
 #include <ostream>
 #include <variant>
-#include <memory>
 
-namespace tcc {
+namespace bcc {
 namespace ast {
 struct Constant {
   int val;
@@ -46,7 +46,6 @@ struct Not : public UnaryOperatorBase {
   void print(std::ostream &out, size_t indent) const;
 };
 
-
 struct Return {
   Expr expr;
 
@@ -72,6 +71,6 @@ std::ostream &operator<<(std::ostream &out, const Function &func);
 
 using Program = Function;
 } // namespace ast
-} // namespace tcc
+} // namespace bcc
 
-#endif // !TCC_AST_HPP
+#endif // !BCC_AST_HPP

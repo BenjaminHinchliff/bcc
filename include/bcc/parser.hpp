@@ -1,5 +1,5 @@
-#ifndef TCC_PARSER_HPP
-#define TCC_PARSER_HPP
+#ifndef BCC_PARSER_HPP
+#define BCC_PARSER_HPP
 
 #include <cassert>
 #include <ostream>
@@ -11,7 +11,7 @@
 #include "ast.hpp"
 #include "lexer.hpp"
 
-namespace tcc {
+namespace bcc {
 namespace parser {
 namespace exceptions {
 class ParserException : public std::exception {
@@ -44,6 +44,6 @@ ast::Program parseTokens(const Tokens &tokens);
 
 ast::Program parse(const std::string &source);
 } // namespace parser
-} // namespace tcc
+} // namespace bcc
 
-#endif // !TCC_PARSER_HPP
+#endif // !BCC_PARSER_HPP

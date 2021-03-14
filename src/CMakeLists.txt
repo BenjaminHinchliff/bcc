@@ -1,24 +1,25 @@
 ﻿cmake_minimum_required(VERSION 3.12)
 
-set(TCC_HDRS_PREFIX
+set(HDRS_PREFIX
 	"../include/")
 
-set(TCC_HDRS
-	"tcc/tcc.hpp"
-	"tcc/lexer.hpp"
-	"tcc/parser.hpp"
-	"tcc/ast.hpp"
-	"tcc/codegen.hpp"
-	"tcc/tokens.hpp")
+set(HDRS
+	"bcc/bcc.hpp"
+	"bcc/lexer.hpp"
+	"bcc/parser.hpp"
+	"bcc/ast.hpp"
+	"bcc/codegen.hpp"
+	"bcc/tokens.hpp")
 
-list(TRANSFORM TCC_HDRS PREPEND ${TCC_HDRS_PREFIX})
+list(TRANSFORM HDRS PREPEND ${HDRS_PREFIX})
 
-set(TCC_SRCS
+set(SRCS
 	"lexer.cpp"
 	"parser.cpp"
 	"ast.cpp"
 	"codegen.cpp"
 	"tokens.cpp")
 
-add_library(libtcc ${TCC_HDRS} ${TCC_SRCS})
-target_include_directories(libtcc PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/${TCC_HDRS_PREFIX}")
+set(LIBRARY_NAME "lib${PROJECT_NAME}")
+add_library(${LIBRARY_NAME} ${HDRS} ${SRCS})
+target_include_directories(${LIBRARY_NAME} PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/${HDRS_PREFIX}")

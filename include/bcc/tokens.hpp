@@ -1,12 +1,12 @@
-#ifndef TCC_TOKENS_HPP
-#define TCC_TOKENS_HPP
+#ifndef BCC_TOKENS_HPP
+#define BCC_TOKENS_HPP
 
 #include <ostream>
 #include <string>
 #include <variant>
 #include <vector>
 
-namespace tcc {
+namespace bcc {
 namespace tokens {
 template <typename T> struct InheritedEquality {
   constexpr bool operator==(const T &) const { return true; }
@@ -71,6 +71,6 @@ std::ostream &operator<<(std::ostream &out, const Tokens &tok);
 } // namespace tokens
 
 using tokens::Tokens;
-} // namespace tcc
+} // namespace bcc
 
-#endif // !TCC_TOKENS_HPP
+#endif // !BCC_TOKENS_HPP

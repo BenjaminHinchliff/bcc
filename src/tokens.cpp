@@ -1,6 +1,6 @@
-#include "tcc/tokens.hpp"
+#include "bcc/tokens.hpp"
 
-namespace tcc {
+namespace bcc {
 namespace tokens {
 std::ostream &operator<<(std::ostream &out, const OpenBrace &) {
   out << "OpenBrace";
@@ -103,4 +103,4 @@ std::ostream &operator<<(std::ostream &out, const Tokens &toks) {
   return out;
 }
 } // namespace tokens
-} // namespace tcc
+} // namespace bcc

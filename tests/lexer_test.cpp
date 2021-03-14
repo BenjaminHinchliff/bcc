@@ -1,5 +1,5 @@
 #include <catch2/catch.hpp>
-#include <tcc/tcc.hpp>
+#include <bcc/bcc.hpp>
 
 #include <iostream>
 
@@ -9,8 +9,8 @@ int main() {
     return 2;
 }
 )#"};
-  auto tokens = tcc::lexer::lex(source);
-  using namespace tcc::tokens;
+  auto tokens = bcc::lexer::lex(source);
+  using namespace bcc::tokens;
   std::vector<Token> target{
       TypeKeyword::INT, Identifier{"main"}, OpenParen{},
       CloseParen{},     OpenBrace{},        Keyword::RETURN,
@@ -25,8 +25,8 @@ int main() {
     return -5;
 }
 )#"};
-  auto tokens = tcc::lexer::lex(source);
-  using namespace tcc::tokens;
+  auto tokens = bcc::lexer::lex(source);
+  using namespace bcc::tokens;
   std::vector<Token> target{
       TypeKeyword::INT,
       Identifier{"main"},
@@ -48,8 +48,8 @@ int main() {
     return ~12;
 }
 )#"};
-  auto tokens = tcc::lexer::lex(source);
-  using namespace tcc::tokens;
+  auto tokens = bcc::lexer::lex(source);
+  using namespace bcc::tokens;
   std::vector<Token> target{
       TypeKeyword::INT,
       Identifier{"main"},
@@ -71,8 +71,8 @@ int main() {
     return !0;
 }
 )#"};
-  auto tokens = tcc::lexer::lex(source);
-  using namespace tcc::tokens;
+  auto tokens = bcc::lexer::lex(source);
+  using namespace bcc::tokens;
   std::vector<Token> target{
       TypeKeyword::INT,
       Identifier{"main"},

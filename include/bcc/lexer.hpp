@@ -1,5 +1,5 @@
-#ifndef TCC_LEXER_HPP
-#define TCC_LEXER_HPP
+#ifndef BCC_LEXER_HPP
+#define BCC_LEXER_HPP
 
 #include <string>
 #include <variant>
@@ -7,10 +7,10 @@
 
 #include "tokens.hpp"
 
-namespace tcc {
+namespace bcc {
 namespace lexer {
 Tokens lex(const std::string &source);
 } // namespace lexer
-} // namespace tcc
+} // namespace bcc
 
-#endif // !TCC_LEXER_HPP
+#endif // !BCC_LEXER_HPP

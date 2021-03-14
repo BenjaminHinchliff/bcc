@@ -26,7 +26,7 @@ set(TEST_SRCS
 set(TESTS_NAME "${PROJECT_NAME}_tests")	
 add_executable(${TESTS_NAME} ${TEST_SRCS})
 
-target_link_libraries(${TESTS_NAME} PUBLIC libtcc)
+target_link_libraries(${TESTS_NAME} PUBLIC libbcc)
 target_link_libraries(${TESTS_NAME} PUBLIC Catch2::Catch2 Catch2::Catch2WithMain)
 
 include(CTest)

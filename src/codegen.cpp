@@ -1,6 +1,6 @@
-#include "tcc/codegen.hpp"
+#include "bcc/codegen.hpp"
 
-namespace tcc {
+namespace bcc {
 namespace codegen {
 using namespace ast;
 
@@ -60,4 +60,4 @@ void codegen(std::ostream &out, const Program &program) {
   codegenFunction(out, program);
 }
 } // namespace codegen
-} // namespace tcc
+} // namespace bcc

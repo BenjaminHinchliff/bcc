@@ -1,6 +1,6 @@
-#include "tcc/parser.hpp"
+#include "bcc/parser.hpp"
 
-namespace tcc {
+namespace bcc {
 namespace parser {
 using namespace ast;
 namespace exceptions {
@@ -107,4 +107,4 @@ ast::Program parse(const std::string &source) {
   return parseTokens(tokens);
 }
 } // namespace parser
-} // namespace tcc
+} // namespace bcc

@@ -1,19 +1,19 @@
-#include "tcc/ast.hpp"
+#include "bcc/ast.hpp"
 
-namespace tcc {
+namespace bcc {
 namespace ast {
 // overloaded lambda helper
 template <class... Ts> struct overloaded : Ts... { using Ts::operator()...; };
 template <class... Ts> overloaded(Ts...) -> overloaded<Ts...>;
 
 void printHelper(const Expr &expr, std::ostream &out, size_t indent) {
-  std::visit(
-      overloaded{[&](const UnaryOperator &op) {
-                   std::visit(
-                       [&](const auto &ex) { ex.print(out, indent); }, op);
-                 },
-                 [&](const auto &ex) { ex.print(out, indent); }},
-      expr);
+  std::visit(overloaded{[&](const UnaryOperator &op) {
+                          std::visit(
+                              [&](const auto &ex) { ex.print(out, indent); },
+                              op);
+                        },
+                        [&](const auto &ex) { ex.print(out, indent); }},
+             expr);
 }
 
 std::string createIndent(size_t indent) { return std::string(indent, ' '); }
@@ -88,4 +88,4 @@ std::ostream &operator<<(std::ostream &out, const Function &func) {
   return out;
 }
 } // namespace ast
-} // namespace tcc
+} // namespace bcc

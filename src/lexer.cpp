@@ -1,9 +1,9 @@
-#include "tcc/lexer.hpp"
+#include "bcc/lexer.hpp"
 
 #include <iostream>
 #include <unordered_map>
 
-namespace tcc {
+namespace bcc {
 namespace lexer {
 using namespace tokens;
 
@@ -79,4 +79,4 @@ Tokens lex(const std::string &source) {
   return tokens;
 }
 } // namespace lexer
-} // namespace tcc
+} // namespace bcc

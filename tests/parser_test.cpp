@@ -1,8 +1,8 @@
 #include <catch2/catch.hpp>
 #include <iostream>
-#include <tcc/tcc.hpp>
+#include <bcc/bcc.hpp>
 
-using namespace tcc::ast;
+using namespace bcc::ast;
 
 TEST_CASE("return 2 parses", "[parser]") {
   SECTION("valid program") {
@@ -11,7 +11,7 @@ int main() {
     return 2;
 }
 )#"};
-    auto ast = tcc::parser::parse(source);
+    auto ast = bcc::parser::parse(source);
     Program target{"main", Stmt{Return{Constant{2}}}};
     REQUIRE(ast == target);
   }
@@ -47,7 +47,7 @@ int main() {
 }
 )"};
     for (const std::string &source : sources) {
-      REQUIRE_THROWS_AS(tcc::parser::parse(source), tcc::parser::Exception);
+      REQUIRE_THROWS_AS(bcc::parser::parse(source), bcc::parser::Exception);
     }
   }
 }
@@ -58,7 +58,7 @@ int main() {
     return -5;
 }
 )#"};
-  auto ast = tcc::parser::parse(source);
+  auto ast = bcc::parser::parse(source);
   Program target{"main", Return{Negation(std::make_unique<Expr>(Constant{5}))}};
   REQUIRE(ast == target);
 }
@@ -69,7 +69,7 @@ int main() {
     return ~12;
 }
 )#"};
-  auto ast = tcc::parser::parse(source);
+  auto ast = bcc::parser::parse(source);
   Program target{
       "main", Return{BitwiseComplement(std::make_unique<Expr>(Constant{12}))}};
   REQUIRE(ast == target);
@@ -81,7 +81,7 @@ int main() {
     return !0;
 }
 )#"};
-  auto ast = tcc::parser::parse(source);
+  auto ast = bcc::parser::parse(source);
   Program target{"main", Return{Not(std::make_unique<Expr>(Constant{0}))}};
   REQUIRE(ast == target);
 }
@@ -92,7 +92,7 @@ int main() {
     return !-~0;
 }
 )#"};
-  auto ast = tcc::parser::parse(source);
+  auto ast = bcc::parser::parse(source);
   Program target{
       "main", Return{Not(std::make_unique<Expr>(Negation(std::make_unique<Expr>(
                   BitwiseComplement(std::make_unique<Expr>(Constant{0}))))))}};
