@@ -8,10 +8,32 @@ using namespace ast;
 template <class... Ts> struct overloaded : Ts... { using Ts::operator()...; };
 template <class... Ts> overloaded(Ts...) -> overloaded<Ts...>;
 
+void codegenExpr(std::ostream &out, const Expr &expr);
+
+void codegenUnary(std::ostream &out, const UnaryOperator &oper) {
+  std::visit(overloaded{[&](const Negation &neg) {
+                          codegenExpr(out, *neg.expr);
+                          out << "\tneg\t%eax\n";
+                        },
+                        [&](const BitwiseComplement &bits) {
+                          codegenExpr(out, *bits.expr);
+                          out << "\tnot\t%eax\n";
+                        },
+                        [&](const Not & not ) {
+                          codegenExpr(out, *not .expr);
+                          out << "\tcmpl\t$0, %eax\n";
+                          out << "\tmovl\t$0, %eax\n";
+                          out << "\tsete\t%al\n";
+                        }},
+             oper);
+}
+
 void codegenExpr(std::ostream &out, const Expr &expr) {
-  std::visit(overloaded{[&](const Constant &c) { out << "\tmovl\t$" << c.val << ", %eax\n"; },
-                        [&](const auto &) {}},
-             expr);
+  std::visit(
+      overloaded{
+          [&](const Constant &c) { out << "\tmovl\t$" << c.val << ", %eax\n"; },
+          [&](const UnaryOperator &oper) { codegenUnary(out, oper); }},
+      expr);
 }
 
 void codegenStmt(std::ostream &out, const Stmt &stmt) {
