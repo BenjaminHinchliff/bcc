@@ -3,6 +3,7 @@
 
 #include <ostream>
 #include <variant>
+#include <memory>
 
 namespace tcc {
 namespace ast {
@@ -22,7 +23,7 @@ using UnaryOperator = std::variant<Negation, BitwiseComplement, Not>;
 using Expr = std::variant<Constant, UnaryOperator>;
 
 struct UnaryOperatorBase {
-  UnaryOperatorBase(std::unique_ptr<Expr> &expr);
+  UnaryOperatorBase(std::unique_ptr<Expr> expr);
 
   bool operator==(const UnaryOperatorBase &other) const;
   bool operator!=(const UnaryOperatorBase &other) const;

@@ -56,11 +56,11 @@ Expr parseExpr(Tokens::const_iterator &it) {
     auto expr = std::make_unique<Expr>(parseExpr(++it));
     switch (*op) {
     case UnaryOperator::NEGATION:
-      return Negation(expr);
+      return Negation(std::move(expr));
     case UnaryOperator::BITWISE_COMPLEMENT:
-      return BitwiseComplement(expr);
+      return BitwiseComplement(std::move(expr));
     case UnaryOperator::LOGICAL_NEGATION:
-      return Not(expr);
+      return Not(std::move(expr));
     default:
       throw std::runtime_error("internal error: unknown unary operator");
     }

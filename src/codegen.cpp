@@ -19,8 +19,8 @@ void codegenUnary(std::ostream &out, const UnaryOperator &oper) {
                           codegenExpr(out, *bits.expr);
                           out << "\tnot\t%eax\n";
                         },
-                        [&](const Not & not ) {
-                          codegenExpr(out, *not .expr);
+                        [&](const Not &uNot) {
+                          codegenExpr(out, *uNot.expr);
                           out << "\tcmpl\t$0, %eax\n";
                           out << "\tmovl\t$0, %eax\n";
                           out << "\tsete\t%al\n";

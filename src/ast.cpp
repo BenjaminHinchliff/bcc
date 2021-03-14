@@ -28,7 +28,7 @@ void Constant::print(std::ostream &out, size_t indent) const {
   out << "Constant{" << val << "}\n";
 }
 
-UnaryOperatorBase::UnaryOperatorBase(std::unique_ptr<Expr> &expr)
+UnaryOperatorBase::UnaryOperatorBase(std::unique_ptr<Expr> expr)
     : expr(std::move(expr)) {}
 bool UnaryOperatorBase::operator==(const UnaryOperatorBase &other) const {
   return *expr == *other.expr;
