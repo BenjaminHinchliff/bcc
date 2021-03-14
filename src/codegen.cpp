@@ -22,7 +22,7 @@ void codegenUnary(std::ostream &out, const UnaryOperator &oper) {
                         [&](const Not &uNot) {
                           codegenExpr(out, *uNot.expr);
                           out << "\tcmpl\t$0, %eax\n";
-                          out << "\tmovl\t$0, %eax\n";
+                          out << "\txor\t%eax, %eax\n";
                           out << "\tsete\t%al\n";
                         }},
              oper);

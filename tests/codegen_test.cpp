@@ -64,7 +64,7 @@ int main() {
   std::stringstream ss;
   bcc::codegen::codegen(ss, ast);
   std::string target(
-      "\t.globl\tmain\nmain:\n\tmovl\t$1, %eax\n\tcmpl\t$0, %eax\n\tmovl\t$0, %eax\n\tsete\t%al\n\tretq\n");
+      "\t.globl\tmain\nmain:\n\tmovl\t$1, %eax\n\tcmpl\t$0, %eax\n\txor\t%eax, %eax\n\tsete\t%al\n\tretq\n");
 #ifdef _WIN32
   target.insert(0, "\t.def\tmain;\n");
 #endif // _WIN32
