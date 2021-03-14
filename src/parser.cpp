@@ -10,7 +10,15 @@ const char *ParserException::what() const noexcept { return message.c_str(); }
 UnexpectedToken::UnexpectedToken(const tokens::Token &given,
                                  const tokens::Token &expected) {
   std::stringstream msgStream;
-  msgStream << "unexpected token given: " << given << " expected: " << expected;
+  msgStream << "unexpected token - given: " << given
+            << " expected: " << expected;
+  message = msgStream.str();
+}
+
+UnexpectedRule::UnexpectedRule(const tokens::Token &given,
+                               const std::string &rule) {
+  std::stringstream msgStream;
+  msgStream << "unexpected rule - given: " << given << " expected: " << rule;
   message = msgStream.str();
 }
 
@@ -36,15 +44,29 @@ void ensureToken(Tokens::const_iterator &it, const Tokens::const_iterator &end,
 }
 
 Expr parseExpr(Tokens::const_iterator &it) {
-  if (!std::holds_alternative<tokens::Literal>(*it)) {
-    throw UnexpectedToken(*it, tokens::Literal{});
+  if (auto lit = std::get_if<tokens::Literal>(&*it)) {
+    if (!std::holds_alternative<tokens::literals::Int>(*lit)) {
+      throw UnexpectedToken(*lit, tokens::literals::Int{});
+    }
+    int val = std::get<tokens::literals::Int>(*lit).value;
+    ++it;
+    return Constant{val};
+  } else if (auto op = std::get_if<tokens::UnaryOperator>(&*it)) {
+    using tokens::UnaryOperator;
+    auto expr = std::make_unique<Expr>(parseExpr(++it));
+    switch (*op) {
+    case UnaryOperator::NEGATION:
+      return Negation(expr);
+    case UnaryOperator::BITWISE_COMPLEMENT:
+      return BitwiseComplement(expr);
+    case UnaryOperator::LOGICAL_NEGATION:
+      return Not(expr);
+    default:
+      throw std::runtime_error("internal error: unknown unary operator");
+    }
+  } else {
+    throw UnexpectedRule(*it, "expression");
   }
-  const auto &lit = std::get<tokens::Literal>(*it++);
-  if (!std::holds_alternative<tokens::literals::Int>(lit)) {
-    throw UnexpectedToken(lit, tokens::literals::Int{});
-  }
-  int val = std::get<tokens::literals::Int>(lit).value;
-  return Constant{val};
 }
 
 Stmt parseStmt(Tokens::const_iterator &it, const Tokens::const_iterator &end) {
@@ -52,7 +74,7 @@ Stmt parseStmt(Tokens::const_iterator &it, const Tokens::const_iterator &end) {
   Expr expr = parseExpr(it);
   // consume semicolon
   ensureToken(it, end, tokens::Semicolon{});
-  return Return{expr};
+  return Return{std::move(expr)};
 }
 
 Function parseFunction(Tokens::const_iterator &it,
@@ -70,7 +92,7 @@ Function parseFunction(Tokens::const_iterator &it,
   ensureToken(it, end, tokens::OpenBrace{});
   Stmt body = parseStmt(it, end);
   ensureToken(it, end, tokens::CloseBrace{});
-  return Function{name, body};
+  return Function{name, std::move(body)};
 }
 
 Program parseTokens(const Tokens &tokens) {

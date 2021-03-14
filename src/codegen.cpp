@@ -4,16 +4,20 @@ namespace tcc {
 namespace codegen {
 using namespace ast;
 
+// overloaded lambda helper
+template <class... Ts> struct overloaded : Ts... { using Ts::operator()...; };
+template <class... Ts> overloaded(Ts...) -> overloaded<Ts...>;
+
 void codegenExpr(std::ostream &out, const Expr &expr) {
-  std::visit([&](const Constant &c) { out << '$' << c.val; }, expr);
+  std::visit(overloaded{[&](const Constant &c) { out << "\tmovl\t$" << c.val << ", %eax\n"; },
+                        [&](const auto &) {}},
+             expr);
 }
 
 void codegenStmt(std::ostream &out, const Stmt &stmt) {
   std::visit(
       [&](const Return &ret) {
-        out << "\tmovl\t";
         codegenExpr(out, ret.expr);
-        out << ", %eax\n";
         out << "\tretq\n";
       },
       stmt);

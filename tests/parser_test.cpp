@@ -51,3 +51,50 @@ int main() {
     }
   }
 }
+
+TEST_CASE("negate parses", "[parser]") {
+  std::string source{R"#(
+int main() {
+    return -5;
+}
+)#"};
+  auto ast = tcc::parser::parse(source);
+  Program target{"main", Return{Negation(std::make_unique<Expr>(Constant{5}))}};
+  REQUIRE(ast == target);
+}
+
+TEST_CASE("bitwise complement parses", "[parser]") {
+  std::string source{R"#(
+int main() {
+    return ~12;
+}
+)#"};
+  auto ast = tcc::parser::parse(source);
+  Program target{
+      "main", Return{BitwiseComplement(std::make_unique<Expr>(Constant{12}))}};
+  REQUIRE(ast == target);
+}
+
+TEST_CASE("logical not parses", "[parser]") {
+  std::string source{R"#(
+int main() {
+    return !0;
+}
+)#"};
+  auto ast = tcc::parser::parse(source);
+  Program target{"main", Return{Not(std::make_unique<Expr>(Constant{0}))}};
+  REQUIRE(ast == target);
+}
+
+TEST_CASE("nested ops parse", "[parser]") {
+  std::string source{R"#(
+int main() {
+    return !-~0;
+}
+)#"};
+  auto ast = tcc::parser::parse(source);
+  Program target{
+      "main", Return{Not(std::make_unique<Expr>(Negation(std::make_unique<Expr>(
+                  BitwiseComplement(std::make_unique<Expr>(Constant{0}))))))}};
+  REQUIRE(ast == target);
+}

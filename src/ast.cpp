@@ -2,6 +2,20 @@
 
 namespace tcc {
 namespace ast {
+// overloaded lambda helper
+template <class... Ts> struct overloaded : Ts... { using Ts::operator()...; };
+template <class... Ts> overloaded(Ts...) -> overloaded<Ts...>;
+
+void printHelper(const Expr &expr, std::ostream &out, size_t indent) {
+  std::visit(
+      overloaded{[&](const UnaryOperator &op) {
+                   std::visit(
+                       [&](const auto &ex) { ex.print(out, indent); }, op);
+                 },
+                 [&](const auto &ex) { ex.print(out, indent); }},
+      expr);
+}
+
 std::string createIndent(size_t indent) { return std::string(indent, ' '); }
 
 bool Constant::operator==(const Constant &other) const {
@@ -14,6 +28,36 @@ void Constant::print(std::ostream &out, size_t indent) const {
   out << "Constant{" << val << "}\n";
 }
 
+UnaryOperatorBase::UnaryOperatorBase(std::unique_ptr<Expr> &expr)
+    : expr(std::move(expr)) {}
+bool UnaryOperatorBase::operator==(const UnaryOperatorBase &other) const {
+  return *expr == *other.expr;
+}
+bool UnaryOperatorBase::operator!=(const UnaryOperatorBase &other) const {
+  return !(*this == other);
+}
+
+void Negation::print(std::ostream &out, size_t indent) const {
+  out << "Negation{\n";
+  out << createIndent(indent + 4);
+  printHelper(*expr, out, indent + 4);
+  out << createIndent(indent) << "}\n";
+}
+
+void BitwiseComplement::print(std::ostream &out, size_t indent) const {
+  out << "BitwiseComplement{\n";
+  out << createIndent(indent + 4);
+  printHelper(*expr, out, indent + 4);
+  out << createIndent(indent) << "}\n";
+}
+
+void Not::print(std::ostream &out, size_t indent) const {
+  out << "Not{\n";
+  out << createIndent(indent + 4);
+  printHelper(*expr, out, indent + 4);
+  out << createIndent(indent) << "}\n";
+}
+
 bool Return::operator==(const Return &other) const {
   return expr == other.expr;
 }
@@ -21,7 +65,7 @@ bool Return::operator!=(const Return &other) const { return !(*this == other); }
 void Return::print(std::ostream &out, size_t indent) const {
   out << "Return{\n";
   out << createIndent(indent + 4);
-  std::visit([&](const auto &e) { e.print(out, indent + 4); }, expr);
+  printHelper(expr, out, indent + 4);
   out << createIndent(indent) << "}\n";
 }
 

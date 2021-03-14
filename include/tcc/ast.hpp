@@ -15,7 +15,36 @@ struct Constant {
   void print(std::ostream &out, size_t indent) const;
 };
 
-using Expr = std::variant<Constant>;
+struct Negation;
+struct BitwiseComplement;
+struct Not;
+using UnaryOperator = std::variant<Negation, BitwiseComplement, Not>;
+using Expr = std::variant<Constant, UnaryOperator>;
+
+struct UnaryOperatorBase {
+  UnaryOperatorBase(std::unique_ptr<Expr> &expr);
+
+  bool operator==(const UnaryOperatorBase &other) const;
+  bool operator!=(const UnaryOperatorBase &other) const;
+
+  std::unique_ptr<Expr> expr;
+};
+
+struct Negation : public UnaryOperatorBase {
+  using UnaryOperatorBase::UnaryOperatorBase;
+  void print(std::ostream &out, size_t indent) const;
+};
+
+struct BitwiseComplement : public UnaryOperatorBase {
+  using UnaryOperatorBase::UnaryOperatorBase;
+  void print(std::ostream &out, size_t indent) const;
+};
+
+struct Not : public UnaryOperatorBase {
+  using UnaryOperatorBase::UnaryOperatorBase;
+  void print(std::ostream &out, size_t indent) const;
+};
+
 
 struct Return {
   Expr expr;

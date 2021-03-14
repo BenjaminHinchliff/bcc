@@ -27,6 +27,11 @@ public:
   UnexpectedToken(const tokens::Token &given, const tokens::Token &expected);
 };
 
+class UnexpectedRule : public ParserException {
+public:
+  UnexpectedRule(const tokens::Token &given, const std::string &rule);
+};
+
 class UnexpectedEOF : public ParserException {
 public:
   UnexpectedEOF(const tokens::Token &expected);
