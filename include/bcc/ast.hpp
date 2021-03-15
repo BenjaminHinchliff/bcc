@@ -7,6 +7,13 @@
 
 namespace bcc {
 namespace ast {
+template <typename T, typename... Args> struct variant_extend;
+
+template <typename... Args0, typename... Args1>
+struct variant_extend<std::variant<Args0...>, Args1...> {
+    using type = std::variant<Args0..., Args1...>;
+};
+
 struct Constant {
   int val;
 
@@ -20,7 +27,7 @@ struct Negation;
 struct BitwiseComplement;
 struct Not;
 using UnaryOperator = std::variant<Negation, BitwiseComplement, Not>;
-using Expr = std::variant<Constant, UnaryOperator>;
+using Expr = variant_extend<UnaryOperator, Constant>::type;
 
 struct UnaryOperatorBase {
   UnaryOperatorBase(std::unique_ptr<Expr> expr);

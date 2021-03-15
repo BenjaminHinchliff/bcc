@@ -10,8 +10,11 @@ template <class... Ts> overloaded(Ts...) -> overloaded<Ts...>;
 
 void codegenExpr(std::ostream &out, const Expr &expr);
 
-void codegenUnary(std::ostream &out, const UnaryOperator &oper) {
-  std::visit(overloaded{[&](const Negation &neg) {
+void codegenExpr(std::ostream &out, const Expr &expr) {
+  std::visit(overloaded{[&](const Constant &c) {
+                          out << "\tmovl\t$" << c.val << ", %eax\n";
+                        },
+                        [&](const Negation &neg) {
                           codegenExpr(out, *neg.expr);
                           out << "\tneg\t%eax\n";
                         },
@@ -25,15 +28,7 @@ void codegenUnary(std::ostream &out, const UnaryOperator &oper) {
                           out << "\txor\t%eax, %eax\n";
                           out << "\tsete\t%al\n";
                         }},
-             oper);
-}
-
-void codegenExpr(std::ostream &out, const Expr &expr) {
-  std::visit(
-      overloaded{
-          [&](const Constant &c) { out << "\tmovl\t$" << c.val << ", %eax\n"; },
-          [&](const UnaryOperator &oper) { codegenUnary(out, oper); }},
-      expr);
+             expr);
 }
 
 void codegenStmt(std::ostream &out, const Stmt &stmt) {
