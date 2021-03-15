@@ -72,6 +72,15 @@ Tokens lex(const std::string &source) {
     case ';':
       tokens.emplace_back(Semicolon{});
       break;
+    case '+':
+      tokens.emplace_back(Addition{});
+      break;
+    case '*':
+      tokens.emplace_back(Multiplication{});
+      break;
+    case '-':
+      tokens.emplace_back(Division{});
+      break;
     }
   }
   return tokens;

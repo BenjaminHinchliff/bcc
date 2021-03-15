@@ -43,6 +43,15 @@ std::ostream &operator<<(std::ostream &out, const BitwiseComplement &tok);
 struct LogicalNegation : InheritedEquality<LogicalNegation> {};
 std::ostream &operator<<(std::ostream &out, const LogicalNegation &tok);
 
+struct Addition : InheritedEquality<Addition> {};
+std::ostream &operator<<(std::ostream &out, const Addition &tok);
+
+struct Multiplication : InheritedEquality<Multiplication> {};
+std::ostream &operator<<(std::ostream &out, const Multiplication &tok);
+
+struct Division : InheritedEquality<Division> {};
+std::ostream &operator<<(std::ostream &out, const Division &tok);
+
 struct Identifier {
   std::string name;
 
@@ -65,10 +74,10 @@ using Literal = std::variant<literals::Int>;
 
 std::ostream &operator<<(std::ostream &out, const Literal &lit);
 
-using Token =
-    std::variant<OpenBrace, CloseBrace, OpenParen, CloseParen, Semicolon,
-                 Keyword, TypeKeyword, Minus, BitwiseComplement,
-                 LogicalNegation, Identifier, Literal>;
+using Token = std::variant<OpenBrace, CloseBrace, OpenParen, CloseParen,
+                           Semicolon, Keyword, TypeKeyword, Minus,
+                           BitwiseComplement, LogicalNegation, Identifier,
+                           Addition, Multiplication, Division, Literal>;
 
 std::ostream &operator<<(std::ostream &out, const Token &tok);
 

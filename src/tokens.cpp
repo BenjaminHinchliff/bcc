@@ -64,6 +64,21 @@ std::ostream &operator<<(std::ostream &out, const LogicalNegation &) {
   return out;
 }
 
+std::ostream &operator<<(std::ostream &out, const Addition &tok) {
+  out << "Addition";
+  return out;
+}
+
+std::ostream& operator<<(std::ostream& out, const Multiplication& tok) {
+  out << "Multiplication";
+  return out;
+}
+
+std::ostream &operator<<(std::ostream &out, const Division &tok) {
+  out << "Division";
+  return out;
+}
+
 bool Identifier::operator==(const Identifier &other) const {
   return name == other.name;
 }
