@@ -14,7 +14,7 @@ int main() {
   std::vector<Token> target{
       TypeKeyword::INT, Identifier{"main"}, OpenParen{},
       CloseParen{},     OpenBrace{},        Keyword::RETURN,
-      literals::Int{2}, Semicolon{},        CloseBrace{},
+      Int{2},           Semicolon{},        CloseBrace{},
   };
   REQUIRE(tokens == target);
 }
@@ -29,7 +29,7 @@ int main() {
   using namespace bcc::tokens;
   std::vector<Token> target{
       TypeKeyword::INT, Identifier{"main"}, OpenParen{}, CloseParen{},
-      OpenBrace{},      Keyword::RETURN,    Minus{},     literals::Int{5},
+      OpenBrace{},      Keyword::RETURN,    Minus{},     Int{5},
       Semicolon{},      CloseBrace{},
   };
   REQUIRE(tokens == target);
@@ -44,10 +44,9 @@ int main() {
   auto tokens = bcc::lexer::lex(source);
   using namespace bcc::tokens;
   std::vector<Token> target{
-      TypeKeyword::INT,    Identifier{"main"}, OpenParen{},
-      CloseParen{},        OpenBrace{},        Keyword::RETURN,
-      BitwiseComplement{}, literals::Int{12},  Semicolon{},
-      CloseBrace{},
+      TypeKeyword::INT, Identifier{"main"}, OpenParen{},         CloseParen{},
+      OpenBrace{},      Keyword::RETURN,    BitwiseComplement{}, Int{12},
+      Semicolon{},      CloseBrace{},
   };
   REQUIRE(tokens == target);
 }
@@ -62,7 +61,7 @@ int main() {
   using namespace bcc::tokens;
   std::vector<Token> target{
       TypeKeyword::INT, Identifier{"main"}, OpenParen{},       CloseParen{},
-      OpenBrace{},      Keyword::RETURN,    LogicalNegation{}, literals::Int{0},
+      OpenBrace{},      Keyword::RETURN,    LogicalNegation{}, Int{0},
       Semicolon{},      CloseBrace{},
   };
   REQUIRE(tokens == target);
@@ -77,10 +76,10 @@ int main() {
   auto tokens = bcc::lexer::lex(source);
   using namespace bcc::tokens;
   std::vector<Token> target{
-      TypeKeyword::INT, Identifier{"main"}, OpenParen{},      CloseParen{},
-      OpenBrace{},      Keyword::RETURN,    literals::Int{2}, Addition{},
-      literals::Int{3}, Multiplication{},   literals::Int{4}, Minus{},
-      literals::Int{2}, Semicolon{},        CloseBrace{},
+      TypeKeyword::INT, Identifier{"main"}, OpenParen{},  CloseParen{},
+      OpenBrace{},      Keyword::RETURN,    Int{2},       Addition{},
+      Int{3},           Multiplication{},   Int{4},       Minus{},
+      Int{2},           Semicolon{},        CloseBrace{},
   };
   REQUIRE(tokens == target);
 }

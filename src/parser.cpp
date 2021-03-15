@@ -44,11 +44,8 @@ void ensureToken(Tokens::const_iterator &it, const Tokens::const_iterator &end,
 }
 
 Expr parseExpr(Tokens::const_iterator &it) {
-  if (auto lit = std::get_if<tokens::Literal>(&*it)) {
-    if (!std::holds_alternative<tokens::literals::Int>(*lit)) {
-      throw UnexpectedToken(*lit, tokens::literals::Int{});
-    }
-    int val = std::get<tokens::literals::Int>(*lit).value;
+  if (auto lit = std::get_if<tokens::Int>(&*it)) {
+    int val = lit->value;
     ++it;
     return Constant{val};
   } else if (std::holds_alternative<tokens::Minus>(*it)) {

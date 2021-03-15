@@ -45,7 +45,7 @@ Tokens lex(const std::string &source) {
         value = value * 10 + letter - '0';
         letter = *(++it);
       } while (std::isdigit(letter));
-      tokens.emplace_back(literals::Int{value});
+      tokens.emplace_back(Int{value});
     }
 
     // unary operators

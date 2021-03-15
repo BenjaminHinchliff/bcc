@@ -1,6 +1,6 @@
+#include <bcc/bcc.hpp>
 #include <catch2/catch.hpp>
 #include <iostream>
-#include <bcc/bcc.hpp>
 
 using namespace bcc::ast;
 

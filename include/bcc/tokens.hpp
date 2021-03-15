@@ -60,7 +60,6 @@ struct Identifier {
 };
 std::ostream &operator<<(std::ostream &out, const Identifier &tok);
 
-namespace literals {
 struct Int {
   int value;
 
@@ -68,16 +67,11 @@ struct Int {
   bool operator!=(const Int &other) const;
 };
 std::ostream &operator<<(std::ostream &out, const Int &tok);
-} // namespace literals
-
-using Literal = std::variant<literals::Int>;
-
-std::ostream &operator<<(std::ostream &out, const Literal &lit);
 
 using Token = std::variant<OpenBrace, CloseBrace, OpenParen, CloseParen,
                            Semicolon, Keyword, TypeKeyword, Minus,
                            BitwiseComplement, LogicalNegation, Identifier,
-                           Addition, Multiplication, Division, Literal>;
+                           Addition, Multiplication, Division, Int>;
 
 std::ostream &operator<<(std::ostream &out, const Token &tok);
 

@@ -90,17 +90,10 @@ std::ostream &operator<<(std::ostream &out, const Identifier &tok) {
   return out;
 }
 
-namespace literals {
 bool Int::operator==(const Int &other) const { return value == other.value; }
 bool Int::operator!=(const Int &other) const { return !(*this == other); }
 std::ostream &operator<<(std::ostream &out, const Int &tok) {
   out << "Int(" << tok.value << ')';
-  return out;
-}
-} // namespace literals
-
-std::ostream &operator<<(std::ostream &out, const Literal &lit) {
-  std::visit([&](const auto &l) { out << l; }, lit);
   return out;
 }
 
