@@ -49,20 +49,18 @@ std::ostream &operator<<(std::ostream &out, const TypeKeyword &tok) {
   return out;
 }
 
-std::ostream &operator<<(std::ostream &out, const UnaryOperator &tok) {
-  switch (tok) {
-  case UnaryOperator::NEGATION:
-    out << "NEGATION";
-    break;
-  case UnaryOperator::BITWISE_COMPLEMENT:
-    out << "BITWISE_COMPLEMENT";
-    break;
-  case UnaryOperator::LOGICAL_NEGATION:
-    out << "LOGICAL_NEGATION";
-    break;
-  default:
-    throw std::runtime_error("unknown keyword");
-  }
+std::ostream &operator<<(std::ostream &out, const Minus &tok) {
+  out << "Minus";
+  return out;
+}
+
+std::ostream &operator<<(std::ostream &out, const BitwiseComplement &) {
+  out << "BitwiseComplement";
+  return out;
+}
+
+std::ostream &operator<<(std::ostream &out, const LogicalNegation &) {
+  out << "LogicalNegation";
   return out;
 }
 

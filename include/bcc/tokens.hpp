@@ -34,8 +34,14 @@ std::ostream &operator<<(std::ostream &out, const Keyword &tok);
 enum class TypeKeyword { INT };
 std::ostream &operator<<(std::ostream &out, const TypeKeyword &tok);
 
-enum class UnaryOperator { NEGATION, BITWISE_COMPLEMENT, LOGICAL_NEGATION };
-std::ostream &operator<<(std::ostream &out, const UnaryOperator &tok);
+struct Minus : InheritedEquality<Minus> {};
+std::ostream &operator<<(std::ostream &out, const Minus &tok);
+
+struct BitwiseComplement : InheritedEquality<BitwiseComplement> {};
+std::ostream &operator<<(std::ostream &out, const BitwiseComplement &tok);
+
+struct LogicalNegation : InheritedEquality<LogicalNegation> {};
+std::ostream &operator<<(std::ostream &out, const LogicalNegation &tok);
 
 struct Identifier {
   std::string name;
@@ -61,7 +67,8 @@ std::ostream &operator<<(std::ostream &out, const Literal &lit);
 
 using Token =
     std::variant<OpenBrace, CloseBrace, OpenParen, CloseParen, Semicolon,
-                 Keyword, TypeKeyword, UnaryOperator, Identifier, Literal>;
+                 Keyword, TypeKeyword, Minus, BitwiseComplement,
+                 LogicalNegation, Identifier, Literal>;
 
 std::ostream &operator<<(std::ostream &out, const Token &tok);
 

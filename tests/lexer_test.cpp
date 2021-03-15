@@ -1,5 +1,5 @@
-#include <catch2/catch.hpp>
 #include <bcc/bcc.hpp>
+#include <catch2/catch.hpp>
 
 #include <iostream>
 
@@ -28,16 +28,9 @@ int main() {
   auto tokens = bcc::lexer::lex(source);
   using namespace bcc::tokens;
   std::vector<Token> target{
-      TypeKeyword::INT,
-      Identifier{"main"},
-      OpenParen{},
-      CloseParen{},
-      OpenBrace{},
-      Keyword::RETURN,
-      UnaryOperator::NEGATION,
-      literals::Int{5},
-      Semicolon{},
-      CloseBrace{},
+      TypeKeyword::INT, Identifier{"main"}, OpenParen{}, CloseParen{},
+      OpenBrace{},      Keyword::RETURN,    Minus{},     literals::Int{5},
+      Semicolon{},      CloseBrace{},
   };
   REQUIRE(tokens == target);
 }
@@ -51,15 +44,9 @@ int main() {
   auto tokens = bcc::lexer::lex(source);
   using namespace bcc::tokens;
   std::vector<Token> target{
-      TypeKeyword::INT,
-      Identifier{"main"},
-      OpenParen{},
-      CloseParen{},
-      OpenBrace{},
-      Keyword::RETURN,
-      UnaryOperator::BITWISE_COMPLEMENT,
-      literals::Int{12},
-      Semicolon{},
+      TypeKeyword::INT,    Identifier{"main"}, OpenParen{},
+      CloseParen{},        OpenBrace{},        Keyword::RETURN,
+      BitwiseComplement{}, literals::Int{12},  Semicolon{},
       CloseBrace{},
   };
   REQUIRE(tokens == target);
@@ -74,17 +61,9 @@ int main() {
   auto tokens = bcc::lexer::lex(source);
   using namespace bcc::tokens;
   std::vector<Token> target{
-      TypeKeyword::INT,
-      Identifier{"main"},
-      OpenParen{},
-      CloseParen{},
-      OpenBrace{},
-      Keyword::RETURN,
-      UnaryOperator::LOGICAL_NEGATION,
-      literals::Int{0},
-      Semicolon{},
-      CloseBrace{},
+      TypeKeyword::INT, Identifier{"main"}, OpenParen{},       CloseParen{},
+      OpenBrace{},      Keyword::RETURN,    LogicalNegation{}, literals::Int{0},
+      Semicolon{},      CloseBrace{},
   };
   REQUIRE(tokens == target);
 }
-

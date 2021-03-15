@@ -51,20 +51,16 @@ Expr parseExpr(Tokens::const_iterator &it) {
     int val = std::get<tokens::literals::Int>(*lit).value;
     ++it;
     return Constant{val};
-  } else if (auto op = std::get_if<tokens::UnaryOperator>(&*it)) {
-    using tokens::UnaryOperator;
+  } else if (std::holds_alternative<tokens::Minus>(*it)) {
     auto expr = std::make_unique<Expr>(parseExpr(++it));
-    switch (*op) {
-    case UnaryOperator::NEGATION:
-      return Negation(std::move(expr));
-    case UnaryOperator::BITWISE_COMPLEMENT:
-      return BitwiseComplement(std::move(expr));
-    case UnaryOperator::LOGICAL_NEGATION:
-      return Not(std::move(expr));
-    default:
-      throw std::runtime_error("internal error: unknown unary operator");
-    }
-  } else {
+    return Negation(std::move(expr));
+  } else if (std::holds_alternative<tokens::BitwiseComplement>(*it)) {
+    auto expr = std::make_unique<Expr>(parseExpr(++it));
+    return BitwiseComplement(std::move(expr));
+  } else if (std::holds_alternative<tokens::LogicalNegation>(*it)) {
+    auto expr = std::make_unique<Expr>(parseExpr(++it));
+    return Not(std::move(expr));
+  }  else {
     throw UnexpectedRule(*it, "expression");
   }
 }

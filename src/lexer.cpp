@@ -10,10 +10,8 @@ using namespace tokens;
 const std::unordered_map<std::string, Token> stringToKeyword{
     {"int", TypeKeyword::INT}, {"return", Keyword::RETURN}};
 
-const std::unordered_map<char, UnaryOperator> charToUnary{
-    {'-', UnaryOperator::NEGATION},
-    {'~', UnaryOperator::BITWISE_COMPLEMENT},
-    {'!', UnaryOperator::LOGICAL_NEGATION}};
+const std::unordered_map<char, Token> charToUnary{
+    {'-', Minus{}}, {'~', BitwiseComplement{}}, {'!', LogicalNegation{}}};
 
 Tokens lex(const std::string &source) {
 
