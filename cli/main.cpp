@@ -20,9 +20,9 @@ int main(int argc, char **argv) {
   inputStrStream << inputFile.rdbuf();
   auto tokens = bcc::lexer::lex(inputStrStream.str());
 
-  bcc::ast::Program program;
+  std::unique_ptr<bcc::ast::Program> program;
   try {
-    program = bcc::parser::parseTokens(tokens);
+    program = std::make_unique<bcc::ast::Program>(bcc::parser::parseTokens(tokens));
   } catch (const bcc::parser::Exception &e) {
     std::cerr << "Parsing error:\n";
     std::cerr << '\t' << e.what() << '\n';
@@ -30,7 +30,7 @@ int main(int argc, char **argv) {
   }
 
   std::ofstream outputFile(outputPath);
-  bcc::codegen::codegen(outputFile, program);
+  bcc::codegen::codegen(outputFile, *program);
   outputFile.close();
 
 #ifdef _WIN32
