@@ -149,3 +149,21 @@ int main() {
                              std::make_unique<Expr>(Constant{3})))}};
   REQUIRE(ast == target);
 }
+
+TEST_CASE("associativity works", "[parser]") {
+  std::string source{R"(
+int main() {
+    return 6 / 3 / 2;
+}
+)"};
+  auto ast = bcc::parser::parse(source);
+  using namespace bcc::ast;
+  Program target{"main", Return{std::make_unique<Expr>(BinaryOperator(
+                             BinaryOperator::Kind::Division,
+                             std::make_unique<Expr>(BinaryOperator(
+                                 BinaryOperator::Kind::Division,
+                                 std::make_unique<Expr>(Constant{6}),
+                                 std::make_unique<Expr>(Constant{3}))),
+                             std::make_unique<Expr>(Constant{2})))}};
+  REQUIRE(ast == target);
+}

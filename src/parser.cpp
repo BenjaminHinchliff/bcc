@@ -118,11 +118,12 @@ std::unique_ptr<Expr> parseExpr(Tokens::const_iterator &it, int min_prec) {
     if (prec_it == BINARY_OP_PREC.end())
       break;
 
+    int prec = prec_it->second;
     // break if precedence is too low
-    if (prec_it->second < min_prec)
+    if (prec < min_prec)
       break;
 
-    auto rhs = parseExpr(++it, min_prec + 1);
+    auto rhs = parseExpr(++it, prec + 1);
     BinaryOperator::Kind kind = BIN_OP_TOK_TO_KIND.at(op);
     result = std::make_unique<Expr>(BinaryOperator(kind, std::move(result), std::move(rhs)));
   }
