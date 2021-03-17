@@ -12,7 +12,7 @@ int main() {
 }
 )#"};
     auto ast = bcc::parser::parse(source);
-    Program target{"main", Stmt{Return{Constant{2}}}};
+    Program target{"main", Stmt{Return{std::make_unique<Expr>(Constant{2})}}};
     REQUIRE(ast == target);
   }
 
@@ -59,7 +59,8 @@ int main() {
 }
 )#"};
   auto ast = bcc::parser::parse(source);
-  Program target{"main", Return{Negation(std::make_unique<Expr>(Constant{5}))}};
+  Program target{"main", Return{std::make_unique<Expr>(
+                             Negation(std::make_unique<Expr>(Constant{5})))}};
   REQUIRE(ast == target);
 }
 
@@ -70,8 +71,8 @@ int main() {
 }
 )#"};
   auto ast = bcc::parser::parse(source);
-  Program target{
-      "main", Return{BitwiseComplement(std::make_unique<Expr>(Constant{12}))}};
+  Program target{"main", Return{std::make_unique<Expr>(BitwiseComplement(
+                             std::make_unique<Expr>(Constant{12})))}};
   REQUIRE(ast == target);
 }
 
@@ -82,7 +83,8 @@ int main() {
 }
 )#"};
   auto ast = bcc::parser::parse(source);
-  Program target{"main", Return{Not(std::make_unique<Expr>(Constant{0}))}};
+  Program target{"main", Return{std::make_unique<Expr>(
+                             Not(std::make_unique<Expr>(Constant{0})))}};
   REQUIRE(ast == target);
 }
 
@@ -93,8 +95,27 @@ int main() {
 }
 )#"};
   auto ast = bcc::parser::parse(source);
-  Program target{
-      "main", Return{Not(std::make_unique<Expr>(Negation(std::make_unique<Expr>(
-                  BitwiseComplement(std::make_unique<Expr>(Constant{0}))))))}};
+  Program target{"main",
+                 Return{std::make_unique<Expr>(Not(std::make_unique<Expr>(
+                     Negation(std::make_unique<Expr>(BitwiseComplement(
+                         std::make_unique<Expr>(Constant{0})))))))}};
+  REQUIRE(ast == target);
+}
+
+TEST_CASE("operators parse", "[lexer]") {
+  std::string source{R"(
+int main() {
+    return 2 + 3 * 4 - 2;
+}
+)"};
+  auto ast = bcc::parser::parse(source);
+  using namespace bcc::ast;
+  Program target{"main", Return{std::make_unique<Expr>(Subtraction(
+                             std::make_unique<Expr>(Addition(
+                                 std::make_unique<Expr>(Constant{2}),
+                                 std::make_unique<Expr>(Multiplication(
+                                     std::make_unique<Expr>(Constant{3}),
+                                     std::make_unique<Expr>(Constant{4}))))),
+                             std::make_unique<Expr>(Constant{2})))}};
   REQUIRE(ast == target);
 }

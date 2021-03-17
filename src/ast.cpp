@@ -7,13 +7,7 @@ template <class... Ts> struct overloaded : Ts... { using Ts::operator()...; };
 template <class... Ts> overloaded(Ts...) -> overloaded<Ts...>;
 
 void printHelper(const Expr &expr, std::ostream &out, size_t indent) {
-  std::visit(overloaded{[&](const UnaryOperator &op) {
-                          std::visit(
-                              [&](const auto &ex) { ex.print(out, indent); },
-                              op);
-                        },
-                        [&](const auto &ex) { ex.print(out, indent); }},
-             expr);
+  std::visit(overloaded{[&](const auto &ex) { ex.print(out, indent); }}, expr);
 }
 
 std::string createIndent(size_t indent) { return std::string(indent, ' '); }
@@ -26,15 +20,6 @@ bool Constant::operator!=(const Constant &other) const {
 }
 void Constant::print(std::ostream &out, size_t indent) const {
   out << "Constant{" << val << "}\n";
-}
-
-UnaryOperatorBase::UnaryOperatorBase(std::unique_ptr<Expr> expr)
-    : expr(std::move(expr)) {}
-bool UnaryOperatorBase::operator==(const UnaryOperatorBase &other) const {
-  return *expr == *other.expr;
-}
-bool UnaryOperatorBase::operator!=(const UnaryOperatorBase &other) const {
-  return !(*this == other);
 }
 
 void Negation::print(std::ostream &out, size_t indent) const {
@@ -58,14 +43,50 @@ void Not::print(std::ostream &out, size_t indent) const {
   out << createIndent(indent) << "}\n";
 }
 
+void Addition::print(std::ostream &out, size_t indent) const {
+  out << "Addition{\n";
+  out << createIndent(indent + 4) << "lhs: ";
+  printHelper(*lhs, out, indent + 4);
+  out << createIndent(indent + 4) << "rhs: ";
+  printHelper(*rhs, out, indent + 4);
+  out << createIndent(indent) << "}\n";
+}
+
+void Subtraction::print(std::ostream &out, size_t indent) const {
+  out << "Subtraction{\n";
+  out << createIndent(indent + 4) << "lhs: ";
+  printHelper(*lhs, out, indent + 4);
+  out << createIndent(indent + 4) << "rhs: ";
+  printHelper(*rhs, out, indent + 4);
+  out << createIndent(indent) << "}\n";
+}
+
+void Multiplication::print(std::ostream &out, size_t indent) const {
+  out << "Multiplication{\n";
+  out << createIndent(indent + 4) << "lhs: ";
+  printHelper(*lhs, out, indent + 4);
+  out << createIndent(indent + 4) << "rhs: ";
+  printHelper(*rhs, out, indent + 4);
+  out << createIndent(indent) << "}\n";
+}
+
+void Division::print(std::ostream &out, size_t indent) const {
+  out << "Division{\n";
+  out << createIndent(indent + 4) << "lhs: ";
+  printHelper(*lhs, out, indent + 4);
+  out << createIndent(indent + 4) << "rhs: ";
+  printHelper(*rhs, out, indent + 4);
+  out << createIndent(indent) << "}\n";
+}
+
 bool Return::operator==(const Return &other) const {
-  return expr == other.expr;
+  return *expr == *other.expr;
 }
 bool Return::operator!=(const Return &other) const { return !(*this == other); }
 void Return::print(std::ostream &out, size_t indent) const {
   out << "Return{\n";
   out << createIndent(indent + 4);
-  printHelper(expr, out, indent + 4);
+  printHelper(*expr, out, indent + 4);
   out << createIndent(indent) << "}\n";
 }
 

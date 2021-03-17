@@ -7,6 +7,8 @@
 #include <stdexcept>
 #include <string>
 #include <variant>
+#include <array>
+#include <algorithm>
 
 #include "ast.hpp"
 #include "lexer.hpp"
