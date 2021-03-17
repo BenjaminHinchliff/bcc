@@ -48,6 +48,15 @@ void codegenExpr(std::ostream &out, const Expr &expr) {
             out << "\tpop\t%rcx\n";
             out << "\timul\t%rcx, %rax\n";
           },
+          [&](const Division &div) {
+            codegenExpr(out, *div.lhs);
+            out << "\tpush\t%rax\n";
+            codegenExpr(out, *div.rhs);
+            out << "\tmov\t%rax, %rcx\n";
+            out << "\tpop\t%rax\n";
+            out << "\tcqo\n";
+            out << "\tidiv\t%rcx\n";
+          },
           [&](const auto &) { throw std::runtime_error("unimplemented"); }},
       expr);
 }
@@ -56,7 +65,7 @@ void codegenStmt(std::ostream &out, const Stmt &stmt) {
   std::visit(
       [&](const Return &ret) {
         codegenExpr(out, *ret.expr);
-        out << "\tretq\n";
+        out << "\tret\n";
       },
       stmt);
 }

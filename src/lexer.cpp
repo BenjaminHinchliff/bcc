@@ -10,9 +10,6 @@ using namespace tokens;
 const std::unordered_map<std::string, Token> stringToKeyword{
     {"int", TypeKeyword::INT}, {"return", Keyword::RETURN}};
 
-const std::unordered_map<char, Token> charToUnary{
-    {'-', Minus{}}, {'~', BitwiseComplement{}}, {'!', LogicalNegation{}}};
-
 Tokens lex(const std::string &source) {
 
   std::vector<Token> tokens;
@@ -48,13 +45,6 @@ Tokens lex(const std::string &source) {
       tokens.emplace_back(Int{value});
     }
 
-    // unary operators
-    auto unary_it = charToUnary.find(letter);
-    if (unary_it != charToUnary.end()) {
-      tokens.emplace_back(unary_it->second);
-      continue;
-    }
-
     // single character tokens
     switch (letter) {
     case '{':
@@ -79,7 +69,16 @@ Tokens lex(const std::string &source) {
       tokens.emplace_back(Multiplication{});
       break;
     case '-':
+      tokens.emplace_back(Minus{});
+      break;
+    case '/':
       tokens.emplace_back(Division{});
+      break;
+    case '~':
+      tokens.emplace_back(BitwiseComplement{});
+      break;
+    case '!':
+      tokens.emplace_back(LogicalNegation{});
       break;
     }
   }

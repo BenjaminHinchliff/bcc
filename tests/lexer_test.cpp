@@ -70,16 +70,17 @@ int main() {
 TEST_CASE("operators lex", "[lexer]") {
   std::string source{R"(
 int main() {
-    return 2 + 3 * 4 - 2;
+    return 2 + 3 * 4 - 2 / 2;
 }
 )"};
   auto tokens = bcc::lexer::lex(source);
   using namespace bcc::tokens;
   std::vector<Token> target{
-      TypeKeyword::INT, Identifier{"main"}, OpenParen{},  CloseParen{},
-      OpenBrace{},      Keyword::RETURN,    Int{2},       Addition{},
-      Int{3},           Multiplication{},   Int{4},       Minus{},
-      Int{2},           Semicolon{},        CloseBrace{},
+      TypeKeyword::INT, Identifier{"main"}, OpenParen{}, CloseParen{},
+      OpenBrace{},      Keyword::RETURN,    Int{2},      Addition{},
+      Int{3},           Multiplication{},   Int{4},      Minus{},
+      Int{2},           Division{},         Int{2},      Semicolon{},
+      CloseBrace{},
   };
   REQUIRE(tokens == target);
 }

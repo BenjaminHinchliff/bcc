@@ -105,7 +105,7 @@ int main() {
 TEST_CASE("operators parse", "[parser]") {
   std::string source{R"(
 int main() {
-    return 2 + 3 * 4 - 2;
+    return 2 + 3 * 4 - 2 / 2;
 }
 )"};
   auto ast = bcc::parser::parse(source);
@@ -116,6 +116,23 @@ int main() {
                                  std::make_unique<Expr>(Multiplication(
                                      std::make_unique<Expr>(Constant{3}),
                                      std::make_unique<Expr>(Constant{4}))))),
-                             std::make_unique<Expr>(Constant{2})))}};
+                             std::make_unique<Expr>(Division(
+                                 std::make_unique<Expr>(Constant{2}),
+                                 std::make_unique<Expr>(Constant{2})))))}};
+  REQUIRE(ast == target);
+}
+
+TEST_CASE("unary and binary ops parse", "[parser]") {
+  std::string source{R"(
+int main() {
+    return ~2 + 3;
+}
+)"};
+  auto ast = bcc::parser::parse(source);
+  using namespace bcc::ast;
+  Program target{"main", Return{std::make_unique<Expr>(
+                             Addition(std::make_unique<Expr>(BitwiseComplement(
+                                          std::make_unique<Expr>(Constant{2}))),
+                                      std::make_unique<Expr>(Constant{3})))}};
   REQUIRE(ast == target);
 }

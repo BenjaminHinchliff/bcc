@@ -12,7 +12,7 @@ int main() {
   auto ast = bcc::parser::parse(source);
   std::stringstream ss;
   bcc::codegen::codegen(ss, ast);
-  std::string target("\t.globl\tmain\nmain:\n\tmov\t$2, %rax\n\tretq\n");
+  std::string target("\t.globl\tmain\nmain:\n\tmov\t$2, %rax\n\tret\n");
 #ifdef _WIN32
   target.insert(0, "\t.def\tmain;\n");
 #endif // _WIN32
@@ -29,7 +29,7 @@ int main() {
   std::stringstream ss;
   bcc::codegen::codegen(ss, ast);
   std::string target(
-      "\t.globl\tmain\nmain:\n\tmov\t$5, %rax\n\tneg\t%rax\n\tretq\n");
+      "\t.globl\tmain\nmain:\n\tmov\t$5, %rax\n\tneg\t%rax\n\tret\n");
 #ifdef _WIN32
   target.insert(0, "\t.def\tmain;\n");
 #endif // _WIN32
@@ -46,7 +46,7 @@ int main() {
   std::stringstream ss;
   bcc::codegen::codegen(ss, ast);
   std::string target(
-      "\t.globl\tmain\nmain:\n\tmov\t$12, %rax\n\tnot\t%rax\n\tretq\n");
+      "\t.globl\tmain\nmain:\n\tmov\t$12, %rax\n\tnot\t%rax\n\tret\n");
 #ifdef _WIN32
   target.insert(0, "\t.def\tmain;\n");
 #endif // _WIN32
@@ -68,7 +68,7 @@ int main() {
                      "\tcmp\t$0, %rax\n"
                      "\tmov\t$0, %rax\n"
                      "\tsete\t%al\n"
-                     "\tretq\n");
+                     "\tret\n");
 #ifdef _WIN32
   target.insert(0, "\t.def\tmain;\n");
 #endif // _WIN32
@@ -78,7 +78,7 @@ int main() {
 TEST_CASE("operators codegen", "[codegen]") {
   std::string source{R"(
 int main() {
-    return 2 + 3 * 4 - 2;
+    return 2 + 3 * 4 - 2 / 2;
 }
 )"};
   auto ast = bcc::parser::parse(source);
@@ -97,10 +97,16 @@ int main() {
                      "\tadd\t%rcx, %rax\n"
                      "\tpush\t%rax\n"
                      "\tmov\t$2, %rax\n"
+                     "\tpush\t%rax\n"
+                     "\tmov\t$2, %rax\n"
+                     "\tmov\t%rax, %rcx\n"
+                     "\tpop\t%rax\n"
+                     "\tcqo\n"
+                     "\tidiv\t%rcx\n"
                      "\tmov\t%rax, %rcx\n"
                      "\tpop\t%rax\n"
                      "\tsub\t%rcx, %rax\n"
-                     "\tretq\n");
+                     "\tret\n");
 #ifdef _WIN32
   target.insert(0, "\t.def\tmain;\n");
 #endif // _WIN32

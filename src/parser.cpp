@@ -52,22 +52,24 @@ bool canBeUnary(const tokens::Token &token) {
   return std::find(unaryOps.begin(), unaryOps.end(), token) != unaryOps.end();
 }
 
-std::unique_ptr<Expr> parseExpr(Tokens::const_iterator &it);
+std::unique_ptr<Expr> parseFactor(Tokens::const_iterator &it);
 
 std::unique_ptr<Expr> parseUnary(Tokens::const_iterator &it) {
   if (std::holds_alternative<tokens::Minus>(*it)) {
-    auto expr = parseExpr(++it);
+    auto expr = parseFactor(++it);
     return std::make_unique<Expr>(Negation(std::move(expr)));
   } else if (std::holds_alternative<tokens::BitwiseComplement>(*it)) {
-    auto expr = parseExpr(++it);
+    auto expr = parseFactor(++it);
     return std::make_unique<Expr>(BitwiseComplement(std::move(expr)));
   } else if (std::holds_alternative<tokens::LogicalNegation>(*it)) {
-    auto expr = parseExpr(++it);
+    auto expr = parseFactor(++it);
     return std::make_unique<Expr>(Not(std::move(expr)));
   } else {
     throw UnexpectedRule(*it, "expression");
   }
 }
+
+std::unique_ptr<Expr> parseExpr(Tokens::const_iterator &it);
 
 std::unique_ptr<Expr> parseFactor(Tokens::const_iterator &it) {
   if (std::holds_alternative<tokens::OpenParen>(*it)) {
