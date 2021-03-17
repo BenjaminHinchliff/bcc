@@ -28,29 +28,20 @@ std::ostream &operator<<(std::ostream &out, const CloseParen &);
 struct Semicolon : InheritedEquality<Semicolon> {};
 std::ostream &operator<<(std::ostream &out, const Semicolon &);
 
-enum class Keyword { RETURN };
+enum class Keyword { Return };
 std::ostream &operator<<(std::ostream &out, const Keyword &tok);
 
-enum class TypeKeyword { INT };
+enum class TypeKeyword { Int };
 std::ostream &operator<<(std::ostream &out, const TypeKeyword &tok);
 
-struct Minus : InheritedEquality<Minus> {};
-std::ostream &operator<<(std::ostream &out, const Minus &tok);
-
-struct BitwiseComplement : InheritedEquality<BitwiseComplement> {};
-std::ostream &operator<<(std::ostream &out, const BitwiseComplement &tok);
-
-struct LogicalNegation : InheritedEquality<LogicalNegation> {};
-std::ostream &operator<<(std::ostream &out, const LogicalNegation &tok);
-
-struct Addition : InheritedEquality<Addition> {};
-std::ostream &operator<<(std::ostream &out, const Addition &tok);
-
-struct Multiplication : InheritedEquality<Multiplication> {};
-std::ostream &operator<<(std::ostream &out, const Multiplication &tok);
-
-struct Division : InheritedEquality<Division> {};
-std::ostream &operator<<(std::ostream &out, const Division &tok);
+enum class Operators {
+  BitwiseNot,
+  LogicalNot,
+  Minus,
+  Add,
+  Multiply,
+  Divide,
+};
 
 struct Identifier {
   std::string name;
@@ -69,9 +60,7 @@ struct Int {
 std::ostream &operator<<(std::ostream &out, const Int &tok);
 
 using Token = std::variant<OpenBrace, CloseBrace, OpenParen, CloseParen,
-                           Semicolon, Keyword, TypeKeyword, Minus,
-                           BitwiseComplement, LogicalNegation, Identifier,
-                           Addition, Multiplication, Division, Int>;
+                           Semicolon, Keyword, TypeKeyword, Identifier, Int, Operators>;
 
 std::ostream &operator<<(std::ostream &out, const Token &tok);
 

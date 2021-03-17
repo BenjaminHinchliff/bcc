@@ -29,8 +29,8 @@ std::ostream &operator<<(std::ostream &out, const Semicolon &) {
 
 std::ostream &operator<<(std::ostream &out, const Keyword &tok) {
   switch (tok) {
-  case Keyword::RETURN:
-    out << "RETURN";
+  case Keyword::Return:
+    out << "Return";
     break;
   default:
     throw std::runtime_error("unknown keyword");
@@ -40,42 +40,38 @@ std::ostream &operator<<(std::ostream &out, const Keyword &tok) {
 
 std::ostream &operator<<(std::ostream &out, const TypeKeyword &tok) {
   switch (tok) {
-  case TypeKeyword::INT:
-    out << "INT";
+  case TypeKeyword::Int:
+    out << "Int";
     break;
   default:
-    throw std::runtime_error("unknown keyword");
+    throw std::runtime_error("unknown type keyword");
   }
   return out;
 }
 
-std::ostream &operator<<(std::ostream &out, const Minus &tok) {
-  out << "Minus";
-  return out;
-}
-
-std::ostream &operator<<(std::ostream &out, const BitwiseComplement &) {
-  out << "BitwiseComplement";
-  return out;
-}
-
-std::ostream &operator<<(std::ostream &out, const LogicalNegation &) {
-  out << "LogicalNegation";
-  return out;
-}
-
-std::ostream &operator<<(std::ostream &out, const Addition &tok) {
-  out << "Addition";
-  return out;
-}
-
-std::ostream& operator<<(std::ostream& out, const Multiplication& tok) {
-  out << "Multiplication";
-  return out;
-}
-
-std::ostream &operator<<(std::ostream &out, const Division &tok) {
-  out << "Division";
+std::ostream& operator<<(std::ostream& out, const Operators& tok) {
+  switch (tok) {
+  case Operators::BitwiseNot:
+    out << "BitwiseNot";
+    break;
+  case Operators::LogicalNot:
+    out << "LogicalNot";
+    break;
+  case Operators::Minus:
+    out << "Minus";
+    break;
+  case Operators::Add:
+    out << "Add";
+    break;
+  case Operators::Multiply:
+    out << "Multiply";
+    break;
+  case Operators::Divide:
+    out << "Divide";
+    break;
+  default:
+    throw std::runtime_error("unknown operators");
+  }
   return out;
 }
 

@@ -30,71 +30,52 @@ struct Constant {
   void print(std::ostream &out, size_t indent) const;
 };
 
-struct Negation;
-struct BitwiseComplement;
-struct Not;
-struct Addition;
-struct Subtraction;
-struct Multiplication;
-struct Division;
-using UnaryOperator = std::variant<Negation, BitwiseComplement, Not>;
-using BinaryOperator =
-    std::variant<Addition, Subtraction, Multiplication, Division>;
-using Expr = variant_extend<variant_concat<BinaryOperator, UnaryOperator>::type,
-                            Constant>::type;
+class UnaryOperator;
+class BinaryOperator;
+using Expr = std::variant<UnaryOperator, BinaryOperator, Constant>;
 
-template <typename T> struct UnaryOperatorBase {
-  UnaryOperatorBase(std::unique_ptr<Expr> expr) : expr(std::move(expr)) {}
+class UnaryOperator {
+public:
+  enum class Kind {
+    BitwiseNot,
+    LogicalNot,
+    Negate,
+  };
 
-  bool operator==(const T &other) const;
-  bool operator!=(const T &other) const;
+public:
+  UnaryOperator(Kind kind, std::unique_ptr<Expr> expr);
+  
+public:
+  bool operator==(const UnaryOperator &other) const;
+  bool operator!=(const UnaryOperator &other) const;
+  void print(std::ostream &out, size_t indent) const;
+
+public:
+  Kind kind;
   std::unique_ptr<Expr> expr;
 };
 
-struct Negation : public UnaryOperatorBase<Negation> {
-  using UnaryOperatorBase::UnaryOperatorBase;
+class BinaryOperator {
+public:
+  enum class Kind {
+    Addition,
+    Subtraction,
+    Multiplication,
+    Division
+  };
+
+public:
+  BinaryOperator(Kind kind, std::unique_ptr<Expr> lhs, std::unique_ptr<Expr> rhs);
+
+public:
+  bool operator==(const BinaryOperator &other) const;
+  bool operator!=(const BinaryOperator &other) const;
   void print(std::ostream &out, size_t indent) const;
-};
 
-struct BitwiseComplement : public UnaryOperatorBase<BitwiseComplement> {
-  using UnaryOperatorBase::UnaryOperatorBase;
-  void print(std::ostream &out, size_t indent) const;
-};
-
-struct Not : public UnaryOperatorBase<Not> {
-  using UnaryOperatorBase::UnaryOperatorBase;
-  void print(std::ostream &out, size_t indent) const;
-};
-
-template <typename T> struct BinaryOperatorBase {
-  BinaryOperatorBase(std::unique_ptr<Expr> lhs, std::unique_ptr<Expr> rhs)
-      : lhs(std::move(lhs)), rhs(std::move(rhs)) {}
-
-  bool operator==(const T &other) const;
-  bool operator!=(const T &other) const;
-
+public:
+  Kind kind;
   std::unique_ptr<Expr> lhs;
   std::unique_ptr<Expr> rhs;
-};
-
-struct Addition : public BinaryOperatorBase<Addition> {
-  using BinaryOperatorBase::BinaryOperatorBase;
-  void print(std::ostream &out, size_t indent) const;
-};
-
-struct Subtraction : public BinaryOperatorBase<Subtraction> {
-  using BinaryOperatorBase::BinaryOperatorBase;
-  void print(std::ostream &out, size_t indent) const;
-};
-
-struct Multiplication : public BinaryOperatorBase<Multiplication> {
-  using BinaryOperatorBase::BinaryOperatorBase;
-  void print(std::ostream &out, size_t indent) const;
-};
-
-struct Division : public BinaryOperatorBase<Division> {
-  using BinaryOperatorBase::BinaryOperatorBase;
-  void print(std::ostream &out, size_t indent) const;
 };
 
 struct Return {
@@ -123,7 +104,5 @@ std::ostream &operator<<(std::ostream &out, const Function &func);
 using Program = Function;
 } // namespace ast
 } // namespace bcc
-
-#include "ast.inl"
 
 #endif // !BCC_AST_HPP

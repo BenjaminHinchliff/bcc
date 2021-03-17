@@ -12,50 +12,62 @@ void codegenExpr(std::ostream &out, const Expr &expr) {
   std::visit(
       overloaded{
           [&](const Constant &c) { out << "\tmov\t$" << c.val << ", %rax\n"; },
-          [&](const Negation &neg) {
-            codegenExpr(out, *neg.expr);
-            out << "\tneg\t%rax\n";
+          [&](const UnaryOperator &unOp) {
+            switch (unOp.kind) {
+            case UnaryOperator::Kind::Negate:
+              codegenExpr(out, *unOp.expr);
+              out << "\tneg\t%rax\n";
+              break;
+            case UnaryOperator::Kind::BitwiseNot:
+              codegenExpr(out, *unOp.expr);
+              out << "\tnot\t%rax\n";
+              break;
+            case UnaryOperator::Kind::LogicalNot:
+              codegenExpr(out, *unOp.expr);
+              out << "\tcmp\t$0, %rax\n";
+              out << "\tmov\t$0, %rax\n";
+              out << "\tsete\t%al\n";
+              break;
+            default:
+              throw std::runtime_error("unknown operator kind");
+            }
           },
-          [&](const BitwiseComplement &bits) {
-            codegenExpr(out, *bits.expr);
-            out << "\tnot\t%rax\n";
-          },
-          [&](const Not &uNot) {
-            codegenExpr(out, *uNot.expr);
-            out << "\tcmp\t$0, %rax\n";
-            out << "\tmov\t$0, %rax\n";
-            out << "\tsete\t%al\n";
-          },
-          [&](const Addition &add) {
-            codegenExpr(out, *add.lhs);
-            out << "\tpush\t%rax\n";
-            codegenExpr(out, *add.rhs);
-            out << "\tpop\t%rcx\n";
-            out << "\tadd\t%rcx, %rax\n";
-          },
-          [&](const Subtraction &sub) {
-            codegenExpr(out, *sub.lhs);
-            out << "\tpush\t%rax\n";
-            codegenExpr(out, *sub.rhs);
-            out << "\tmov\t%rax, %rcx\n";
-            out << "\tpop\t%rax\n";
-            out << "\tsub\t%rcx, %rax\n";
-          },
-          [&](const Multiplication &mult) {
-            codegenExpr(out, *mult.lhs);
-            out << "\tpush\t%rax\n";
-            codegenExpr(out, *mult.rhs);
-            out << "\tpop\t%rcx\n";
-            out << "\timul\t%rcx, %rax\n";
-          },
-          [&](const Division &div) {
-            codegenExpr(out, *div.lhs);
-            out << "\tpush\t%rax\n";
-            codegenExpr(out, *div.rhs);
-            out << "\tmov\t%rax, %rcx\n";
-            out << "\tpop\t%rax\n";
-            out << "\tcqo\n";
-            out << "\tidiv\t%rcx\n";
+          [&](const BinaryOperator &binOp) {
+            switch (binOp.kind) {
+            case BinaryOperator::Kind::Addition:
+              codegenExpr(out, *binOp.lhs);
+              out << "\tpush\t%rax\n";
+              codegenExpr(out, *binOp.rhs);
+              out << "\tpop\t%rcx\n";
+              out << "\tadd\t%rcx, %rax\n";
+              break;
+            case BinaryOperator::Kind::Subtraction:
+              codegenExpr(out, *binOp.lhs);
+              out << "\tpush\t%rax\n";
+              codegenExpr(out, *binOp.rhs);
+              out << "\tmov\t%rax, %rcx\n";
+              out << "\tpop\t%rax\n";
+              out << "\tsub\t%rcx, %rax\n";
+              break;
+            case BinaryOperator::Kind::Multiplication:
+              codegenExpr(out, *binOp.lhs);
+              out << "\tpush\t%rax\n";
+              codegenExpr(out, *binOp.rhs);
+              out << "\tpop\t%rcx\n";
+              out << "\timul\t%rcx, %rax\n";
+              break;
+            case BinaryOperator::Kind::Division:
+              codegenExpr(out, *binOp.lhs);
+              out << "\tpush\t%rax\n";
+              codegenExpr(out, *binOp.rhs);
+              out << "\tmov\t%rax, %rcx\n";
+              out << "\tpop\t%rax\n";
+              out << "\tcqo\n";
+              out << "\tidiv\t%rcx\n";
+              break;
+            default:
+              throw std::runtime_error("unknown operator kind");
+            }
           },
           [&](const auto &) { throw std::runtime_error("unimplemented"); }},
       expr);

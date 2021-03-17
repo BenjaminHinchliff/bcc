@@ -1,6 +1,8 @@
 #include "bcc/parser.hpp"
 
 #include <iostream>
+#include <unordered_map>
+#include <unordered_set>
 
 namespace bcc {
 namespace parser {
@@ -45,43 +47,57 @@ void ensureToken(Tokens::const_iterator &it, const Tokens::const_iterator &end,
   ++it;
 }
 
-const std::array<tokens::Token, 4> unaryOps{
-    tokens::Minus{}, tokens::BitwiseComplement{}, tokens::LogicalNegation{}};
+const std::unordered_map<tokens::Operators, UnaryOperator::Kind>
+    UN_OP_TOK_TO_KIND{
+        {tokens::Operators::BitwiseNot, UnaryOperator::Kind::BitwiseNot},
+        {tokens::Operators::LogicalNot, UnaryOperator::Kind::LogicalNot},
+        {tokens::Operators::Minus, UnaryOperator::Kind::Negate}};
 
-bool canBeUnary(const tokens::Token &token) {
-  return std::find(unaryOps.begin(), unaryOps.end(), token) != unaryOps.end();
+const std::unordered_map<tokens::Operators, BinaryOperator::Kind>
+    BIN_OP_TOK_TO_KIND{
+        {tokens::Operators::Add, BinaryOperator::Kind::Addition},
+        {tokens::Operators::Minus, BinaryOperator::Kind::Subtraction},
+        {tokens::Operators::Multiply, BinaryOperator::Kind::Multiplication},
+        {tokens::Operators::Divide, BinaryOperator::Kind::Division},
+    };
+
+bool canBeUnary(const tokens::Operators &op) {
+  return UN_OP_TOK_TO_KIND.count(op);
 }
+
+const std::unordered_map<tokens::Operators, int> BINARY_OP_PREC{
+    {tokens::Operators::Add, 0},
+    {tokens::Operators::Minus, 0},
+    {tokens::Operators::Multiply, 1},
+    {tokens::Operators::Divide, 1}};
 
 std::unique_ptr<Expr> parseFactor(Tokens::const_iterator &it);
 
-std::unique_ptr<Expr> parseUnary(Tokens::const_iterator &it) {
-  if (std::holds_alternative<tokens::Minus>(*it)) {
-    auto expr = parseFactor(++it);
-    return std::make_unique<Expr>(Negation(std::move(expr)));
-  } else if (std::holds_alternative<tokens::BitwiseComplement>(*it)) {
-    auto expr = parseFactor(++it);
-    return std::make_unique<Expr>(BitwiseComplement(std::move(expr)));
-  } else if (std::holds_alternative<tokens::LogicalNegation>(*it)) {
-    auto expr = parseFactor(++it);
-    return std::make_unique<Expr>(Not(std::move(expr)));
-  } else {
+std::unique_ptr<Expr> parseUnary(Tokens::const_iterator &it,
+                                 tokens::Operators op) {
+  auto kind_it = UN_OP_TOK_TO_KIND.find(op);
+  if (kind_it == UN_OP_TOK_TO_KIND.end()) {
     throw UnexpectedRule(*it, "expression");
   }
+  UnaryOperator::Kind kind = kind_it->second;
+  auto expr = parseFactor(++it);
+  return std::make_unique<Expr>(UnaryOperator(kind, std::move(expr)));
 }
 
-std::unique_ptr<Expr> parseExpr(Tokens::const_iterator &it);
+std::unique_ptr<Expr> parseExpr(Tokens::const_iterator &it, int min_prec);
 
 std::unique_ptr<Expr> parseFactor(Tokens::const_iterator &it) {
   if (std::holds_alternative<tokens::OpenParen>(*it)) {
     ++it;
-    std::unique_ptr<Expr> expr = parseExpr(it);
+    std::unique_ptr<Expr> expr = parseExpr(it, 0);
     if (!std::holds_alternative<tokens::CloseParen>(*it)) {
       throw UnexpectedToken(*it, tokens::CloseParen{});
     }
     ++it;
     return expr;
-  } else if (canBeUnary(*it)) {
-    return parseUnary(it);
+  } else if (auto op = std::get_if<tokens::Operators>(&*it);
+             op && canBeUnary(*op)) {
+    return parseUnary(it, *op);
   } else if (auto lit = std::get_if<tokens::Int>(&*it)) {
     int val = lit->value;
     ++it;
@@ -91,43 +107,31 @@ std::unique_ptr<Expr> parseFactor(Tokens::const_iterator &it) {
   }
 }
 
-std::unique_ptr<Expr> parseTerm(Tokens::const_iterator &it) {
-  std::unique_ptr<Expr> factor = parseFactor(it);
-  while (std::holds_alternative<tokens::Multiplication>(*it) ||
-         std::holds_alternative<tokens::Division>(*it)) {
-    if (std::holds_alternative<tokens::Multiplication>(*it)) {
-      std::unique_ptr<Expr> nextFactor = parseFactor(++it);
-      factor = std::make_unique<Expr>(
-          Multiplication(std::move(factor), std::move(nextFactor)));
-    } else if (std::holds_alternative<tokens::Division>(*it)) {
-      std::unique_ptr<Expr> nextFactor = parseFactor(++it);
-      factor = std::make_unique<Expr>(
-          Division(std::move(factor), std::move(nextFactor)));
-    }
-  }
-  return factor;
-}
+std::unique_ptr<Expr> parseExpr(Tokens::const_iterator &it, int min_prec) {
+  std::unique_ptr<Expr> result = parseFactor(it);
 
-std::unique_ptr<Expr> parseExpr(Tokens::const_iterator &it) {
-  std::unique_ptr<Expr> term = parseTerm(it);
-  while (std::holds_alternative<tokens::Addition>(*it) ||
-         std::holds_alternative<tokens::Minus>(*it)) {
-    if (std::holds_alternative<tokens::Addition>(*it)) {
-      std::unique_ptr<Expr> nextTerm = parseTerm(++it);
-      term = std::make_unique<Expr>(
-          Addition(std::move(term), std::move(nextTerm)));
-    } else if (std::holds_alternative<tokens::Minus>(*it)) {
-      std::unique_ptr<Expr> nextTerm = parseTerm(++it);
-      term = std::make_unique<Expr>(
-          Subtraction(std::move(term), std::move(nextTerm)));
-    }
+  while (std::holds_alternative<tokens::Operators>(*it)) {
+    auto op = std::get<tokens::Operators>(*it);
+    auto prec_it = BINARY_OP_PREC.find(op);
+
+    // break out if doesn't have precedence (isn't binop)
+    if (prec_it == BINARY_OP_PREC.end())
+      break;
+
+    // break if precedence is too low
+    if (prec_it->second < min_prec)
+      break;
+
+    auto rhs = parseExpr(++it, min_prec + 1);
+    BinaryOperator::Kind kind = BIN_OP_TOK_TO_KIND.at(op);
+    result = std::make_unique<Expr>(BinaryOperator(kind, std::move(result), std::move(rhs)));
   }
-  return term;
+  return result;
 }
 
 Stmt parseStmt(Tokens::const_iterator &it, const Tokens::const_iterator &end) {
-  ensureToken(it, end, tokens::Token(tokens::Keyword::RETURN));
-  std::unique_ptr<Expr> expr = parseExpr(it);
+  ensureToken(it, end, tokens::Token(tokens::Keyword::Return));
+  std::unique_ptr<Expr> expr = parseExpr(it, 0);
   // consume semicolon
   ensureToken(it, end, tokens::Semicolon{});
   return Return{std::move(expr)};
@@ -137,7 +141,7 @@ Function parseFunction(Tokens::const_iterator &it,
                        const Tokens::const_iterator &end) {
   // type keyword
   if (!std::holds_alternative<tokens::TypeKeyword>(*it)) {
-    throw UnexpectedToken(*it, tokens::Token(tokens::TypeKeyword::INT));
+    throw UnexpectedToken(*it, tokens::Token(tokens::TypeKeyword::Int));
   }
   ++it;
   const std::string &name = std::get<tokens::Identifier>(*it++).name;

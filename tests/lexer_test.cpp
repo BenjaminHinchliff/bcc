@@ -12,8 +12,8 @@ int main() {
   auto tokens = bcc::lexer::lex(source);
   using namespace bcc::tokens;
   std::vector<Token> target{
-      TypeKeyword::INT, Identifier{"main"}, OpenParen{},
-      CloseParen{},     OpenBrace{},        Keyword::RETURN,
+      TypeKeyword::Int, Identifier{"main"}, OpenParen{},
+      CloseParen{},     OpenBrace{},        Keyword::Return,
       Int{2},           Semicolon{},        CloseBrace{},
   };
   REQUIRE(tokens == target);
@@ -28,8 +28,8 @@ int main() {
   auto tokens = bcc::lexer::lex(source);
   using namespace bcc::tokens;
   std::vector<Token> target{
-      TypeKeyword::INT, Identifier{"main"}, OpenParen{}, CloseParen{},
-      OpenBrace{},      Keyword::RETURN,    Minus{},     Int{5},
+      TypeKeyword::Int, Identifier{"main"}, OpenParen{},      CloseParen{},
+      OpenBrace{},      Keyword::Return,    Operators::Minus, Int{5},
       Semicolon{},      CloseBrace{},
   };
   REQUIRE(tokens == target);
@@ -44,8 +44,8 @@ int main() {
   auto tokens = bcc::lexer::lex(source);
   using namespace bcc::tokens;
   std::vector<Token> target{
-      TypeKeyword::INT, Identifier{"main"}, OpenParen{},         CloseParen{},
-      OpenBrace{},      Keyword::RETURN,    BitwiseComplement{}, Int{12},
+      TypeKeyword::Int, Identifier{"main"}, OpenParen{},           CloseParen{},
+      OpenBrace{},      Keyword::Return,    Operators::BitwiseNot, Int{12},
       Semicolon{},      CloseBrace{},
   };
   REQUIRE(tokens == target);
@@ -60,8 +60,8 @@ int main() {
   auto tokens = bcc::lexer::lex(source);
   using namespace bcc::tokens;
   std::vector<Token> target{
-      TypeKeyword::INT, Identifier{"main"}, OpenParen{},       CloseParen{},
-      OpenBrace{},      Keyword::RETURN,    LogicalNegation{}, Int{0},
+      TypeKeyword::Int, Identifier{"main"}, OpenParen{},           CloseParen{},
+      OpenBrace{},      Keyword::Return,    Operators::LogicalNot, Int{0},
       Semicolon{},      CloseBrace{},
   };
   REQUIRE(tokens == target);
@@ -76,10 +76,10 @@ int main() {
   auto tokens = bcc::lexer::lex(source);
   using namespace bcc::tokens;
   std::vector<Token> target{
-      TypeKeyword::INT, Identifier{"main"}, OpenParen{}, CloseParen{},
-      OpenBrace{},      Keyword::RETURN,    Int{2},      Addition{},
-      Int{3},           Multiplication{},   Int{4},      Minus{},
-      Int{2},           Division{},         Int{2},      Semicolon{},
+      TypeKeyword::Int, Identifier{"main"},  OpenParen{}, CloseParen{},
+      OpenBrace{},      Keyword::Return,     Int{2},      Operators::Add,
+      Int{3},           Operators::Multiply, Int{4},      Operators::Minus,
+      Int{2},           Operators::Divide,   Int{2},      Semicolon{},
       CloseBrace{},
   };
   REQUIRE(tokens == target);

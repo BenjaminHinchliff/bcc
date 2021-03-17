@@ -22,56 +22,66 @@ void Constant::print(std::ostream &out, size_t indent) const {
   out << "Constant{" << val << "}\n";
 }
 
-void Negation::print(std::ostream &out, size_t indent) const {
-  out << "Negation{\n";
+UnaryOperator::UnaryOperator(Kind kind, std::unique_ptr<Expr> expr)
+    : kind(kind), expr(std::move(expr)) {}
+
+bool UnaryOperator::operator==(const UnaryOperator &other) const {
+  return kind == other.kind && *expr == *other.expr;
+}
+
+bool UnaryOperator::operator!=(const UnaryOperator &other) const {
+  return !(*this == other);
+}
+
+void UnaryOperator::print(std::ostream &out, size_t indent) const {
+  switch (kind) {
+  case Kind::BitwiseNot:
+    out << "BitwiseNot";
+    break;
+  case Kind::LogicalNot:
+    out << "LogicalNot";
+    break;
+  case Kind::Negate:
+    out << "Negate";
+    break;
+  default:
+    throw std::runtime_error("unknown binary operator kind");
+  }
+  out << "{\n";
   out << createIndent(indent + 4);
   printHelper(*expr, out, indent + 4);
   out << createIndent(indent) << "}\n";
 }
 
-void BitwiseComplement::print(std::ostream &out, size_t indent) const {
-  out << "BitwiseComplement{\n";
-  out << createIndent(indent + 4);
-  printHelper(*expr, out, indent + 4);
-  out << createIndent(indent) << "}\n";
+BinaryOperator::BinaryOperator(Kind kind, std::unique_ptr<Expr> lhs, std::unique_ptr<Expr> rhs)
+    : kind(kind), lhs(std::move(lhs)), rhs(std::move(rhs)) {}
+
+bool BinaryOperator::operator==(const BinaryOperator &other) const {
+  return kind == other.kind && *lhs == *other.lhs && *rhs == *other.rhs;
 }
 
-void Not::print(std::ostream &out, size_t indent) const {
-  out << "Not{\n";
-  out << createIndent(indent + 4);
-  printHelper(*expr, out, indent + 4);
-  out << createIndent(indent) << "}\n";
+bool BinaryOperator::operator!=(const BinaryOperator &other) const {
+  return !(*this == other);
 }
 
-void Addition::print(std::ostream &out, size_t indent) const {
-  out << "Addition{\n";
-  out << createIndent(indent + 4) << "lhs: ";
-  printHelper(*lhs, out, indent + 4);
-  out << createIndent(indent + 4) << "rhs: ";
-  printHelper(*rhs, out, indent + 4);
-  out << createIndent(indent) << "}\n";
-}
-
-void Subtraction::print(std::ostream &out, size_t indent) const {
-  out << "Subtraction{\n";
-  out << createIndent(indent + 4) << "lhs: ";
-  printHelper(*lhs, out, indent + 4);
-  out << createIndent(indent + 4) << "rhs: ";
-  printHelper(*rhs, out, indent + 4);
-  out << createIndent(indent) << "}\n";
-}
-
-void Multiplication::print(std::ostream &out, size_t indent) const {
-  out << "Multiplication{\n";
-  out << createIndent(indent + 4) << "lhs: ";
-  printHelper(*lhs, out, indent + 4);
-  out << createIndent(indent + 4) << "rhs: ";
-  printHelper(*rhs, out, indent + 4);
-  out << createIndent(indent) << "}\n";
-}
-
-void Division::print(std::ostream &out, size_t indent) const {
-  out << "Division{\n";
+void BinaryOperator::print(std::ostream &out, size_t indent) const {
+  switch (kind) {
+  case Kind::Addition:
+    out << "Addition";
+    break;
+  case Kind::Subtraction:
+    out << "Subtraction";
+    break;
+  case Kind::Multiplication:
+    out << "Multiplication";
+    break;
+  case Kind::Division:
+    out << "Division";
+    break;
+  default:
+    throw std::runtime_error("unknown binary operator kind");
+  }
+  out << "{\n";
   out << createIndent(indent + 4) << "lhs: ";
   printHelper(*lhs, out, indent + 4);
   out << createIndent(indent + 4) << "rhs: ";

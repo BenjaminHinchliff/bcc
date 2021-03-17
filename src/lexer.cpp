@@ -8,7 +8,12 @@ namespace lexer {
 using namespace tokens;
 
 const std::unordered_map<std::string, Token> stringToKeyword{
-    {"int", TypeKeyword::INT}, {"return", Keyword::RETURN}};
+    {"int", TypeKeyword::Int}, {"return", Keyword::Return}};
+
+const std::unordered_map<char, Operators> charToOperator{
+    {'~', Operators::BitwiseNot}, {'!', Operators::LogicalNot},
+    {'-', Operators::Minus},      {'+', Operators::Add},
+    {'*', Operators::Multiply},   {'/', Operators::Divide}};
 
 Tokens lex(const std::string &source) {
 
@@ -45,7 +50,14 @@ Tokens lex(const std::string &source) {
       tokens.emplace_back(Int{value});
     }
 
-    // single character tokens
+    // operators
+    auto oper_it = charToOperator.find(letter);
+    if (oper_it != charToOperator.end()) {
+      tokens.emplace_back(oper_it->second);
+      continue;
+    }
+
+    // misc tokens
     switch (letter) {
     case '{':
       tokens.emplace_back(OpenBrace{});
@@ -61,24 +73,6 @@ Tokens lex(const std::string &source) {
       break;
     case ';':
       tokens.emplace_back(Semicolon{});
-      break;
-    case '+':
-      tokens.emplace_back(Addition{});
-      break;
-    case '*':
-      tokens.emplace_back(Multiplication{});
-      break;
-    case '-':
-      tokens.emplace_back(Minus{});
-      break;
-    case '/':
-      tokens.emplace_back(Division{});
-      break;
-    case '~':
-      tokens.emplace_back(BitwiseComplement{});
-      break;
-    case '!':
-      tokens.emplace_back(LogicalNegation{});
       break;
     }
   }
