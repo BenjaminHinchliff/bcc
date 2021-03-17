@@ -21,13 +21,14 @@ endif()
 set(TEST_SRCS
 	"lexer_test.cpp"
 	"parser_test.cpp"
-	"codegen_test.cpp")
+	"codegen_test.cpp"
+	"catch_main.cpp")
 
 set(TESTS_NAME "${PROJECT_NAME}_tests")	
 add_executable(${TESTS_NAME} ${TEST_SRCS})
 
 target_link_libraries(${TESTS_NAME} PUBLIC libbcc)
-target_link_libraries(${TESTS_NAME} PUBLIC Catch2::Catch2 Catch2::Catch2WithMain)
+target_link_libraries(${TESTS_NAME} PUBLIC Catch2::Catch2)
 
 include(CTest)
 include(Catch)
