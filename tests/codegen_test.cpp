@@ -1,7 +1,7 @@
 #include <sstream>
 
-#include <catch2/catch.hpp>
 #include <bcc/bcc.hpp>
+#include <catch2/catch.hpp>
 
 TEST_CASE("return 2 codegens", "[codegen]") {
   std::string source{R"#(
@@ -12,8 +12,7 @@ int main() {
   auto ast = bcc::parser::parse(source);
   std::stringstream ss;
   bcc::codegen::codegen(ss, ast);
-  std::string target(
-      "\t.globl\tmain\nmain:\n\tmovl\t$2, %eax\n\tretq\n");
+  std::string target("\t.globl\tmain\nmain:\n\tmov\t$2, %rax\n\tretq\n");
 #ifdef _WIN32
   target.insert(0, "\t.def\tmain;\n");
 #endif // _WIN32
@@ -30,7 +29,7 @@ int main() {
   std::stringstream ss;
   bcc::codegen::codegen(ss, ast);
   std::string target(
-      "\t.globl\tmain\nmain:\n\tmovl\t$5, %eax\n\tneg\t%eax\n\tretq\n");
+      "\t.globl\tmain\nmain:\n\tmov\t$5, %rax\n\tneg\t%rax\n\tretq\n");
 #ifdef _WIN32
   target.insert(0, "\t.def\tmain;\n");
 #endif // _WIN32
@@ -47,7 +46,7 @@ int main() {
   std::stringstream ss;
   bcc::codegen::codegen(ss, ast);
   std::string target(
-      "\t.globl\tmain\nmain:\n\tmovl\t$12, %eax\n\tnot\t%eax\n\tretq\n");
+      "\t.globl\tmain\nmain:\n\tmov\t$12, %rax\n\tnot\t%rax\n\tretq\n");
 #ifdef _WIN32
   target.insert(0, "\t.def\tmain;\n");
 #endif // _WIN32
@@ -63,11 +62,47 @@ int main() {
   auto ast = bcc::parser::parse(source);
   std::stringstream ss;
   bcc::codegen::codegen(ss, ast);
-  std::string target(
-      "\t.globl\tmain\nmain:\n\tmovl\t$1, %eax\n\tcmpl\t$0, %eax\n\tmovl\t$0, %eax\n\tsete\t%al\n\tretq\n");
+  std::string target("\t.globl\tmain\n"
+                     "main:\n"
+                     "\tmov\t$1, %rax\n"
+                     "\tcmp\t$0, %rax\n"
+                     "\tmov\t$0, %rax\n"
+                     "\tsete\t%al\n"
+                     "\tretq\n");
 #ifdef _WIN32
   target.insert(0, "\t.def\tmain;\n");
 #endif // _WIN32
   REQUIRE(ss.str() == target);
 }
 
+TEST_CASE("operators codegen", "[codegen]") {
+  std::string source{R"(
+int main() {
+    return 2 + 3 * 4 - 2;
+}
+)"};
+  auto ast = bcc::parser::parse(source);
+  std::stringstream ss;
+  bcc::codegen::codegen(ss, ast);
+  std::string target("\t.globl\tmain\n"
+                     "main:\n"
+                     "\tmov\t$2, %rax\n"
+                     "\tpush\t%rax\n"
+                     "\tmov\t$3, %rax\n"
+                     "\tpush\t%rax\n"
+                     "\tmov\t$4, %rax\n"
+                     "\tpop\t%rcx\n"
+                     "\timul\t%rcx, %rax\n"
+                     "\tpop\t%rcx\n"
+                     "\tadd\t%rcx, %rax\n"
+                     "\tpush\t%rax\n"
+                     "\tmov\t$2, %rax\n"
+                     "\tmov\t%rax, %rcx\n"
+                     "\tpop\t%rax\n"
+                     "\tsub\t%rcx, %rax\n"
+                     "\tretq\n");
+#ifdef _WIN32
+  target.insert(0, "\t.def\tmain;\n");
+#endif // _WIN32
+  REQUIRE(ss.str() == target);
+}

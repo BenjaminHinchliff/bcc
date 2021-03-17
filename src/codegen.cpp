@@ -11,20 +11,42 @@ template <class... Ts> overloaded(Ts...) -> overloaded<Ts...>;
 void codegenExpr(std::ostream &out, const Expr &expr) {
   std::visit(
       overloaded{
-          [&](const Constant &c) { out << "\tmovl\t$" << c.val << ", %eax\n"; },
+          [&](const Constant &c) { out << "\tmov\t$" << c.val << ", %rax\n"; },
           [&](const Negation &neg) {
             codegenExpr(out, *neg.expr);
-            out << "\tneg\t%eax\n";
+            out << "\tneg\t%rax\n";
           },
           [&](const BitwiseComplement &bits) {
             codegenExpr(out, *bits.expr);
-            out << "\tnot\t%eax\n";
+            out << "\tnot\t%rax\n";
           },
           [&](const Not &uNot) {
             codegenExpr(out, *uNot.expr);
-            out << "\tcmpl\t$0, %eax\n";
-            out << "\tmovl\t$0, %eax\n";
+            out << "\tcmp\t$0, %rax\n";
+            out << "\tmov\t$0, %rax\n";
             out << "\tsete\t%al\n";
+          },
+          [&](const Addition &add) {
+            codegenExpr(out, *add.lhs);
+            out << "\tpush\t%rax\n";
+            codegenExpr(out, *add.rhs);
+            out << "\tpop\t%rcx\n";
+            out << "\tadd\t%rcx, %rax\n";
+          },
+          [&](const Subtraction &sub) {
+            codegenExpr(out, *sub.lhs);
+            out << "\tpush\t%rax\n";
+            codegenExpr(out, *sub.rhs);
+            out << "\tmov\t%rax, %rcx\n";
+            out << "\tpop\t%rax\n";
+            out << "\tsub\t%rcx, %rax\n";
+          },
+          [&](const Multiplication &mult) {
+            codegenExpr(out, *mult.lhs);
+            out << "\tpush\t%rax\n";
+            codegenExpr(out, *mult.rhs);
+            out << "\tpop\t%rcx\n";
+            out << "\timul\t%rcx, %rax\n";
           },
           [&](const auto &) { throw std::runtime_error("unimplemented"); }},
       expr);

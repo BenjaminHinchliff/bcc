@@ -102,7 +102,7 @@ int main() {
   REQUIRE(ast == target);
 }
 
-TEST_CASE("operators parse", "[lexer]") {
+TEST_CASE("operators parse", "[parser]") {
   std::string source{R"(
 int main() {
     return 2 + 3 * 4 - 2;
