@@ -41,6 +41,14 @@ enum class Operators {
   Add,
   Multiply,
   Divide,
+  And,
+  Or,
+  Equal,
+  NotEqual,
+  LessThan,
+  LessThanOrEqual,
+  GreaterThan,
+  GreaterThanOrEqual
 };
 
 struct Identifier {

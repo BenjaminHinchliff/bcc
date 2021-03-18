@@ -1,6 +1,8 @@
 #include "bcc/lexer.hpp"
 
+#include <algorithm>
 #include <iostream>
+#include <optional>
 #include <unordered_map>
 
 namespace bcc {
@@ -10,13 +12,72 @@ using namespace tokens;
 const std::unordered_map<std::string, Token> stringToKeyword{
     {"int", TypeKeyword::Int}, {"return", Keyword::Return}};
 
-const std::unordered_map<char, Operators> charToOperator{
-    {'~', Operators::BitwiseNot}, {'!', Operators::LogicalNot},
-    {'-', Operators::Minus},      {'+', Operators::Add},
-    {'*', Operators::Multiply},   {'/', Operators::Divide}};
+const std::unordered_map<char, Token> oneLetterToToken{{'{', OpenBrace{}},
+                                                       {'}', CloseBrace{}},
+                                                       {'(', OpenParen{}},
+                                                       {')', CloseParen{}},
+                                                       {';', Semicolon{}}};
+
+template <typename Iter> std::optional<Operators> lettersToOp(Iter &letters) {
+  switch (*letters) {
+  case '-':
+    return Operators::Minus;
+  case '~':
+    return Operators::BitwiseNot;
+  case '!':
+    if (*std::next(letters) == '=') {
+      ++letters;
+      return Operators::NotEqual;
+    } else {
+      return Operators::LogicalNot;
+    }
+  case '+':
+    return Operators::Add;
+  case '*':
+    return Operators::Multiply;
+  case '/':
+    return Operators::Divide;
+  case '&':
+    if (*std::next(letters) == '&') {
+      ++letters;
+      return Operators::And;
+    } else {
+      return {};
+    }
+  case '|':
+    if (*std::next(letters) == '|') {
+      ++letters;
+      return Operators::Or;
+    } else {
+      return {};
+    }
+  case '=':
+    if (*std::next(letters) == '=') {
+      ++letters;
+      return Operators::Equal;
+    } else {
+      return {};
+    }
+  case '<':
+    if (*std::next(letters) == '=') {
+      ++letters;
+      return Operators::LessThanOrEqual;
+    } else {
+      return Operators::LessThan;
+    }
+  case '>':
+    if (*std::next(letters) == '=') {
+      ++letters;
+      return Operators::GreaterThanOrEqual;
+    } else {
+      return Operators::GreaterThan;
+    }
+  default:
+    return {};
+  }
+}
 
 Tokens lex(const std::string &source) {
-
   std::vector<Token> tokens;
   for (auto it = source.cbegin(); it != source.cend(); ++it) {
     char letter = *it;
@@ -51,29 +112,16 @@ Tokens lex(const std::string &source) {
     }
 
     // operators
-    auto oper_it = charToOperator.find(letter);
-    if (oper_it != charToOperator.end()) {
-      tokens.emplace_back(oper_it->second);
-      continue;
+    // consider using trie instead of brute-force
+    const auto maybeOp = lettersToOp(it);
+    if (maybeOp.has_value()) {
+      tokens.emplace_back(*maybeOp);
     }
 
     // misc tokens
-    switch (letter) {
-    case '{':
-      tokens.emplace_back(OpenBrace{});
-      break;
-    case '}':
-      tokens.emplace_back(CloseBrace{});
-      break;
-    case '(':
-      tokens.emplace_back(OpenParen{});
-      break;
-    case ')':
-      tokens.emplace_back(CloseParen{});
-      break;
-    case ';':
-      tokens.emplace_back(Semicolon{});
-      break;
+    const auto one_it = oneLetterToToken.find(letter);
+    if (one_it != oneLetterToToken.end()) {
+      tokens.push_back(one_it->second);
     }
   }
   return tokens;

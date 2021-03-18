@@ -69,8 +69,32 @@ std::ostream& operator<<(std::ostream& out, const Operators& tok) {
   case Operators::Divide:
     out << "Divide";
     break;
+  case Operators::And:
+    out << "And";
+    break;
+  case Operators::Or:
+    out << "Or";
+    break;
+  case Operators::Equal:
+    out << "Equal";
+    break;
+  case Operators::NotEqual:
+    out << "NotEqual";
+    break;
+  case Operators::LessThan:
+    out << "LessThan";
+    break;
+  case Operators::LessThanOrEqual:
+    out << "LessThanOrEqual";
+    break;
+  case Operators::GreaterThan:
+    out << "GreaterThan";
+    break;
+  case Operators::GreaterThanOrEqual:
+    out << "GreaterThanOrEqual";
+    break;
   default:
-    throw std::runtime_error("unknown operators");
+    throw std::runtime_error("unknown operator");
   }
   return out;
 }
