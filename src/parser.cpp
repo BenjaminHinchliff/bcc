@@ -59,6 +59,16 @@ const std::unordered_map<tokens::Operators, BinaryOperator::Kind>
         {tokens::Operators::Minus, BinaryOperator::Kind::Subtraction},
         {tokens::Operators::Multiply, BinaryOperator::Kind::Multiplication},
         {tokens::Operators::Divide, BinaryOperator::Kind::Division},
+        {tokens::Operators::And, BinaryOperator::Kind::And},
+        {tokens::Operators::Or, BinaryOperator::Kind::Or},
+        {tokens::Operators::Equal, BinaryOperator::Kind::Equal},
+        {tokens::Operators::NotEqual, BinaryOperator::Kind::NotEqual},
+        {tokens::Operators::LessThan, BinaryOperator::Kind::LessThan},
+        {tokens::Operators::LessThanOrEqual,
+         BinaryOperator::Kind::LessThanOrEqual},
+        {tokens::Operators::GreaterThan, BinaryOperator::Kind::GreaterThan},
+        {tokens::Operators::GreaterThanOrEqual,
+         BinaryOperator::Kind::GreaterThanOrEqual},
     };
 
 bool canBeUnary(const tokens::Operators &op) {
@@ -66,10 +76,18 @@ bool canBeUnary(const tokens::Operators &op) {
 }
 
 const std::unordered_map<tokens::Operators, int> BINARY_OP_PREC{
-    {tokens::Operators::Add, 0},
-    {tokens::Operators::Minus, 0},
-    {tokens::Operators::Multiply, 1},
-    {tokens::Operators::Divide, 1}};
+    {tokens::Operators::Or, 0},
+    {tokens::Operators::And, 1},
+    {tokens::Operators::Equal, 2},
+    {tokens::Operators::NotEqual, 2},
+    {tokens::Operators::LessThan, 3},
+    {tokens::Operators::LessThanOrEqual, 3},
+    {tokens::Operators::GreaterThan, 3},
+    {tokens::Operators::GreaterThanOrEqual, 3},
+    {tokens::Operators::Add, 4},
+    {tokens::Operators::Minus, 4},
+    {tokens::Operators::Multiply, 5},
+    {tokens::Operators::Divide, 5}};
 
 std::unique_ptr<Expr> parseFactor(Tokens::const_iterator &it);
 
@@ -125,7 +143,8 @@ std::unique_ptr<Expr> parseExpr(Tokens::const_iterator &it, int min_prec) {
 
     auto rhs = parseExpr(++it, prec + 1);
     BinaryOperator::Kind kind = BIN_OP_TOK_TO_KIND.at(op);
-    result = std::make_unique<Expr>(BinaryOperator(kind, std::move(result), std::move(rhs)));
+    result = std::make_unique<Expr>(
+        BinaryOperator(kind, std::move(result), std::move(rhs)));
   }
   return result;
 }

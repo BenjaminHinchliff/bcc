@@ -50,7 +50,20 @@ private:
 
 class BinaryOperator {
 public:
-  enum class Kind { Addition, Subtraction, Multiplication, Division };
+  enum class Kind {
+    Addition,
+    Subtraction,
+    Multiplication,
+    Division,
+    And,
+    Or,
+    Equal,
+    NotEqual,
+    LessThan,
+    LessThanOrEqual,
+    GreaterThan,
+    GreaterThanOrEqual,
+  };
 
 public:
   BinaryOperator(Kind kind, std::unique_ptr<Expr> lhs,

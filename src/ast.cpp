@@ -85,6 +85,30 @@ void BinaryOperator::print(std::ostream &out, size_t indent) const {
   case Kind::Division:
     out << "Division";
     break;
+  case Kind::And:
+    out << "And";
+    break;
+  case Kind::Or:
+    out << "Or";
+    break;
+  case Kind::Equal:
+    out << "Equal";
+    break;
+  case Kind::NotEqual:
+    out << "NotEqual";
+    break;
+  case Kind::LessThan:
+    out << "LessThan";
+    break;
+  case Kind::LessThanOrEqual:
+    out << "LessThanOrEqual";
+    break;
+  case Kind::GreaterThan:
+    out << "GreaterThan";
+    break;
+  case Kind::GreaterThanOrEqual:
+    out << "GreaterThanOrEqual";
+    break;
   default:
     throw std::runtime_error("unknown binary operator kind");
   }
