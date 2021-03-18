@@ -12,6 +12,8 @@ void printHelper(const Expr &expr, std::ostream &out, size_t indent) {
 
 std::string createIndent(size_t indent) { return std::string(indent, ' '); }
 
+Constant::Constant(int val) : val(val) {}
+
 bool Constant::operator==(const Constant &other) const {
   return val == other.val;
 }
@@ -53,7 +55,12 @@ void UnaryOperator::print(std::ostream &out, size_t indent) const {
   out << createIndent(indent) << "}\n";
 }
 
-BinaryOperator::BinaryOperator(Kind kind, std::unique_ptr<Expr> lhs, std::unique_ptr<Expr> rhs)
+UnaryOperator::Kind UnaryOperator::getKind() const { return kind; }
+
+const std::unique_ptr<Expr> &UnaryOperator::getExpr() const { return expr; }
+
+BinaryOperator::BinaryOperator(Kind kind, std::unique_ptr<Expr> lhs,
+                               std::unique_ptr<Expr> rhs)
     : kind(kind), lhs(std::move(lhs)), rhs(std::move(rhs)) {}
 
 bool BinaryOperator::operator==(const BinaryOperator &other) const {
@@ -88,6 +95,9 @@ void BinaryOperator::print(std::ostream &out, size_t indent) const {
   printHelper(*rhs, out, indent + 4);
   out << createIndent(indent) << "}\n";
 }
+BinaryOperator::Kind BinaryOperator::getKind() const { return kind; }
+const std::unique_ptr<Expr> &BinaryOperator::getLhs() const { return lhs; }
+const std::unique_ptr<Expr> &BinaryOperator::getRhs() const { return rhs; }
 
 bool Return::operator==(const Return &other) const {
   return *expr == *other.expr;
@@ -99,9 +109,13 @@ void Return::print(std::ostream &out, size_t indent) const {
   printHelper(*expr, out, indent + 4);
   out << createIndent(indent) << "}\n";
 }
+const std::unique_ptr<Expr> &Return::getExpr() const { return expr; }
+
+Function::Function(const std::string &name, std::unique_ptr<Stmt> body)
+    : name(name), body(std::move(body)) {}
 
 bool Function::operator==(const Function &other) const {
-  return name == other.name && body == other.body;
+  return name == other.name && *body == *other.body;
 }
 bool Function::operator!=(const Function &other) const {
   return !(*this == other);
@@ -110,9 +124,11 @@ void Function::print(std::ostream &out, size_t indent) const {
   out << createIndent(indent) << "Function{\n";
   out << createIndent(indent + 4) << "name: " << name << '\n';
   out << createIndent(indent + 4) << "body: ";
-  std::visit([&](const auto &e) { e.print(out, indent + 4); }, body);
+  std::visit([&](const auto &e) { e.print(out, indent + 4); }, *body);
   out << createIndent(indent) << "}\n";
 }
+const std::string &Function::getName() const { return name; }
+const std::unique_ptr<Stmt> &Function::getBody() const { return body; }
 
 std::ostream &operator<<(std::ostream &out, const Function &func) {
   func.print(out, 0);

@@ -151,9 +151,9 @@ Function parseFunction(Tokens::const_iterator &it,
   ensureToken(it, end, tokens::CloseParen{});
   // body
   ensureToken(it, end, tokens::OpenBrace{});
-  Stmt body = parseStmt(it, end);
+  auto body = std::make_unique<Stmt>(parseStmt(it, end));
   ensureToken(it, end, tokens::CloseBrace{});
-  return Function{name, std::move(body)};
+  return Function(name, std::move(body));
 }
 
 Program parseTokens(const Tokens &tokens) {

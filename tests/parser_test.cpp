@@ -12,7 +12,8 @@ int main() {
 }
 )#"};
     auto ast = bcc::parser::parse(source);
-    Program target{"main", Stmt{Return{std::make_unique<Expr>(Constant{2})}}};
+    Program target("main", std::make_unique<Stmt>(
+                               Return(std::make_unique<Expr>(Constant(2)))));
     REQUIRE(ast == target);
   }
 
@@ -59,9 +60,10 @@ int main() {
 }
 )#"};
   auto ast = bcc::parser::parse(source);
-  Program target{"main", Return{std::make_unique<Expr>(UnaryOperator(
-                             UnaryOperator::Kind::Negate,
-                             std::make_unique<Expr>(Constant{5})))}};
+  Program target(
+      "main",
+      std::make_unique<Stmt>(Return(std::make_unique<Expr>(UnaryOperator(
+          UnaryOperator::Kind::Negate, std::make_unique<Expr>(Constant(5)))))));
   REQUIRE(ast == target);
 }
 
@@ -72,9 +74,10 @@ int main() {
 }
 )#"};
   auto ast = bcc::parser::parse(source);
-  Program target{"main", Return{std::make_unique<Expr>(UnaryOperator(
-                             UnaryOperator::Kind::BitwiseNot,
-                             std::make_unique<Expr>(Constant{12})))}};
+  Program target("main",
+                 std::make_unique<Stmt>(Return(std::make_unique<Expr>(
+                     UnaryOperator(UnaryOperator::Kind::BitwiseNot,
+                                   std::make_unique<Expr>(Constant(12)))))));
   REQUIRE(ast == target);
 }
 
@@ -85,9 +88,10 @@ int main() {
 }
 )#"};
   auto ast = bcc::parser::parse(source);
-  Program target{"main", Return{std::make_unique<Expr>(UnaryOperator(
-                             UnaryOperator::Kind::LogicalNot,
-                             std::make_unique<Expr>(Constant{0})))}};
+  Program target("main",
+                 std::make_unique<Stmt>(Return(std::make_unique<Expr>(
+                     UnaryOperator(UnaryOperator::Kind::LogicalNot,
+                                   std::make_unique<Expr>(Constant(0)))))));
   REQUIRE(ast == target);
 }
 
@@ -98,14 +102,15 @@ int main() {
 }
 )#"};
   auto ast = bcc::parser::parse(source);
-  Program target{"main",
-                 Return{std::make_unique<Expr>(UnaryOperator(
-                     UnaryOperator::Kind::LogicalNot,
-                     std::make_unique<Expr>(UnaryOperator(
-                         UnaryOperator::Kind::Negate,
-                         std::make_unique<Expr>(UnaryOperator(
-                             UnaryOperator::Kind::BitwiseNot,
-                             std::make_unique<Expr>(Constant{0})))))))}};
+  Program target(
+      "main",
+      std::make_unique<Stmt>(Return(std::make_unique<Expr>(
+          UnaryOperator(UnaryOperator::Kind::LogicalNot,
+                        std::make_unique<Expr>(UnaryOperator(
+                            UnaryOperator::Kind::Negate,
+                            std::make_unique<Expr>(UnaryOperator(
+                                UnaryOperator::Kind::BitwiseNot,
+                                std::make_unique<Expr>(Constant(0)))))))))));
   REQUIRE(ast == target);
 }
 
@@ -117,19 +122,21 @@ int main() {
 )"};
   auto ast = bcc::parser::parse(source);
   using namespace bcc::ast;
-  Program target{"main", Return{std::make_unique<Expr>(BinaryOperator(
-                             BinaryOperator::Kind::Subtraction,
+  Program target(
+      "main",
+      std::make_unique<Stmt>(Return(std::make_unique<Expr>(
+          BinaryOperator(BinaryOperator::Kind::Subtraction,
+                         std::make_unique<Expr>(BinaryOperator(
+                             BinaryOperator::Kind::Addition,
+                             std::make_unique<Expr>(Constant(2)),
                              std::make_unique<Expr>(BinaryOperator(
-                                 BinaryOperator::Kind::Addition,
-                                 std::make_unique<Expr>(Constant{2}),
-                                 std::make_unique<Expr>(BinaryOperator(
-                                     BinaryOperator::Kind::Multiplication,
-                                     std::make_unique<Expr>(Constant{3}),
-                                     std::make_unique<Expr>(Constant{4}))))),
-                             std::make_unique<Expr>(BinaryOperator(
-                                 BinaryOperator::Kind::Division,
-                                 std::make_unique<Expr>(Constant{2}),
-                                 std::make_unique<Expr>(Constant{2})))))}};
+                                 BinaryOperator::Kind::Multiplication,
+                                 std::make_unique<Expr>(Constant(3)),
+                                 std::make_unique<Expr>(Constant(4)))))),
+                         std::make_unique<Expr>(BinaryOperator(
+                             BinaryOperator::Kind::Division,
+                             std::make_unique<Expr>(Constant(2)),
+                             std::make_unique<Expr>(Constant(2)))))))));
   REQUIRE(ast == target);
 }
 
@@ -141,12 +148,13 @@ int main() {
 )"};
   auto ast = bcc::parser::parse(source);
   using namespace bcc::ast;
-  Program target{"main", Return{std::make_unique<Expr>(BinaryOperator(
-                             BinaryOperator::Kind::Addition,
-                             std::make_unique<Expr>(UnaryOperator(
-                                 UnaryOperator::Kind::BitwiseNot,
-                                 std::make_unique<Expr>(Constant{2}))),
-                             std::make_unique<Expr>(Constant{3})))}};
+  Program target("main",
+                 std::make_unique<Stmt>(Return(std::make_unique<Expr>(
+                     BinaryOperator(BinaryOperator::Kind::Addition,
+                                    std::make_unique<Expr>(UnaryOperator(
+                                        UnaryOperator::Kind::BitwiseNot,
+                                        std::make_unique<Expr>(Constant(2)))),
+                                    std::make_unique<Expr>(Constant(3)))))));
   REQUIRE(ast == target);
 }
 
@@ -158,12 +166,13 @@ int main() {
 )"};
   auto ast = bcc::parser::parse(source);
   using namespace bcc::ast;
-  Program target{"main", Return{std::make_unique<Expr>(BinaryOperator(
-                             BinaryOperator::Kind::Division,
-                             std::make_unique<Expr>(BinaryOperator(
-                                 BinaryOperator::Kind::Division,
-                                 std::make_unique<Expr>(Constant{6}),
-                                 std::make_unique<Expr>(Constant{3}))),
-                             std::make_unique<Expr>(Constant{2})))}};
+  Program target("main",
+                 std::make_unique<Stmt>(Return(std::make_unique<Expr>(
+                     BinaryOperator(BinaryOperator::Kind::Division,
+                                    std::make_unique<Expr>(BinaryOperator(
+                                        BinaryOperator::Kind::Division,
+                                        std::make_unique<Expr>(Constant(6)),
+                                        std::make_unique<Expr>(Constant(3)))),
+                                    std::make_unique<Expr>(Constant(2)))))));
   REQUIRE(ast == target);
 }
