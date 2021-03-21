@@ -65,6 +65,15 @@ void codegenExpr(std::ostream &out, const Expr &expr) {
               out << "\tcqo\n";
               out << "\tidiv\t%rcx\n";
               break;
+            case BinaryOperator::Kind::Equal:
+              codegenExpr(out, *binOp.getLhs());
+              out << "\tpush\t%rax\n";
+              codegenExpr(out, *binOp.getRhs());
+              out << "\tpop\t%rcx\n";
+              out << "\tcmp\t%rax, %rcx\n";
+              out << "\tmov\t$0, %rax\n";
+              out << "\tsete\t%al\n";
+              break;
             default:
               throw std::runtime_error("unknown operator kind");
             }
