@@ -8,13 +8,13 @@ using namespace ast;
 template <class... Ts> struct overloaded : Ts... { using Ts::operator()...; };
 template <class... Ts> overloaded(Ts...) -> overloaded<Ts...>;
 
-void codegenExpr(std::ostream &out, const Expr &expr);
+void codegenExpr(std::ostream &out, const Expr &expr, size_t &labelCounter);
 
-void baseBinOpCodegen(std::ostream &out, const BinaryOperator &binOp,
-                      bool swapOperands = false) {
-  codegenExpr(out, *binOp.getLhs());
+void baseMathOpCodegen(std::ostream &out, const BinaryOperator &binOp,
+                       size_t &labelCounter, bool swapOperands = false) {
+  codegenExpr(out, *binOp.getLhs(), labelCounter);
   out << "\tpush\t%rax\n";
-  codegenExpr(out, *binOp.getRhs());
+  codegenExpr(out, *binOp.getRhs(), labelCounter);
   if (swapOperands) {
     out << "\tmov\t%rax, %rcx\n";
     out << "\tpop\t%rax\n";
@@ -23,28 +23,33 @@ void baseBinOpCodegen(std::ostream &out, const BinaryOperator &binOp,
   }
 }
 
-void baseCmpOpCodegen(std::ostream &out, const BinaryOperator &binOp) {
-  baseBinOpCodegen(out, binOp);
+void baseCmpOpCodegen(std::ostream &out, const BinaryOperator &binOp,
+                      size_t &labelCounter) {
+  baseMathOpCodegen(out, binOp, labelCounter);
   out << "\tcmp\t%rax, %rcx\n";
   out << "\tmov\t$0, %rax\n";
 }
 
-void codegenExpr(std::ostream &out, const Expr &expr) {
+std::string makeLabel(size_t labelCounter) {
+  return "_clause" + std::to_string(labelCounter);
+}
+
+void codegenExpr(std::ostream &out, const Expr &expr, size_t &labelCounter) {
   std::visit(
       overloaded{
           [&](const Constant &c) { out << "\tmov\t$" << c.val << ", %rax\n"; },
           [&](const UnaryOperator &unOp) {
             switch (unOp.getKind()) {
             case UnaryOperator::Kind::Negate:
-              codegenExpr(out, *unOp.getExpr());
+              codegenExpr(out, *unOp.getExpr(), labelCounter);
               out << "\tneg\t%rax\n";
               break;
             case UnaryOperator::Kind::BitwiseNot:
-              codegenExpr(out, *unOp.getExpr());
+              codegenExpr(out, *unOp.getExpr(), labelCounter);
               out << "\tnot\t%rax\n";
               break;
             case UnaryOperator::Kind::LogicalNot:
-              codegenExpr(out, *unOp.getExpr());
+              codegenExpr(out, *unOp.getExpr(), labelCounter);
               out << "\tcmp\t$0, %rax\n";
               out << "\tmov\t$0, %rax\n";
               out << "\tsete\t%al\n";
@@ -56,48 +61,77 @@ void codegenExpr(std::ostream &out, const Expr &expr) {
           [&](const BinaryOperator &binOp) {
             switch (binOp.getKind()) {
             case BinaryOperator::Kind::Addition:
-              baseBinOpCodegen(out, binOp);
+              baseMathOpCodegen(out, binOp, labelCounter);
               out << "\tadd\t%rcx, %rax\n";
               break;
             case BinaryOperator::Kind::Subtraction:
-              baseBinOpCodegen(out, binOp, true);
+              baseMathOpCodegen(out, binOp, labelCounter, true);
               out << "\tsub\t%rcx, %rax\n";
               break;
             case BinaryOperator::Kind::Multiplication:
-              baseBinOpCodegen(out, binOp);
+              baseMathOpCodegen(out, binOp, labelCounter);
               out << "\timul\t%rcx, %rax\n";
               break;
             case BinaryOperator::Kind::Division:
-              baseBinOpCodegen(out, binOp, true);
+              baseMathOpCodegen(out, binOp, labelCounter, true);
               out << "\tcqo\n";
               out << "\tidiv\t%rcx\n";
               break;
             case BinaryOperator::Kind::Equal:
-              baseBinOpCodegen(out, binOp);
+              baseMathOpCodegen(out, binOp, labelCounter);
               out << "\tcmp\t%rax, %rcx\n";
               out << "\tmov\t$0, %rax\n";
               out << "\tsete\t%al\n";
               break;
             case BinaryOperator::Kind::NotEqual:
-              baseCmpOpCodegen(out, binOp);
+              baseCmpOpCodegen(out, binOp, labelCounter);
               out << "\tsetne\t%al\n";
               break;
             case BinaryOperator::Kind::GreaterThan:
-              baseCmpOpCodegen(out, binOp);
+              baseCmpOpCodegen(out, binOp, labelCounter);
               out << "\tsetg\t%al\n";
               break;
             case BinaryOperator::Kind::GreaterThanOrEqual:
-              baseCmpOpCodegen(out, binOp);
+              baseCmpOpCodegen(out, binOp, labelCounter);
               out << "\tsetge\t%al\n";
               break;
             case BinaryOperator::Kind::LessThan:
-              baseCmpOpCodegen(out, binOp);
+              baseCmpOpCodegen(out, binOp, labelCounter);
               out << "\tsetl\t%al\n";
               break;
             case BinaryOperator::Kind::LessThanOrEqual:
-              baseCmpOpCodegen(out, binOp);
+              baseCmpOpCodegen(out, binOp, labelCounter);
               out << "\tsetle\t%al\n";
               break;
+            case BinaryOperator::Kind::Or: {
+              codegenExpr(out, *binOp.getLhs(), labelCounter);
+              out << "\tcmp\t$0, %rax\n";
+              const std::string rightClause{makeLabel(labelCounter++)};
+              out << "\tje\t" << rightClause << '\n';
+              out << "\tmov\t$1, %rax\n";
+              const std::string endClause{makeLabel(labelCounter++)};
+              out << "\tjmp\t" << endClause << '\n';
+              out << rightClause << ":\n";
+              codegenExpr(out, *binOp.getRhs(), labelCounter);
+              out << "\tcmp\t$0, %rax\n";
+              out << "\tmov\t$0, %rax\n";
+              out << "\tsetne\t%al\n";
+              out << endClause << ":\n";
+            } break;
+            case BinaryOperator::Kind::And: {
+              codegenExpr(out, *binOp.getLhs(), labelCounter);
+              out << "\tcmp\t$0, %rax\n";
+              const std::string rightClause{makeLabel(labelCounter++)};
+              out << "\tjne\t" << rightClause << '\n';
+              const std::string endClause{makeLabel(labelCounter++)};
+              out << "\tjmp\t" << endClause << '\n';
+              out << rightClause << ":\n";
+              codegenExpr(out, *binOp.getRhs(), labelCounter);
+              out << "\tcmp\t$0, %rax\n";
+              out << "\tmov\t$0, %rax\n";
+              out << "\tsetne\t%al\n";
+              out << endClause << ":\n";
+            } break;
             default:
               throw std::runtime_error("unknown operator kind");
             }
@@ -109,7 +143,8 @@ void codegenExpr(std::ostream &out, const Expr &expr) {
 void codegenStmt(std::ostream &out, const Stmt &stmt) {
   std::visit(
       [&](const Return &ret) {
-        codegenExpr(out, *ret.getExpr());
+        size_t labelCounter = 0;
+        codegenExpr(out, *ret.getExpr(), labelCounter);
         out << "\tret\n";
       },
       stmt);
