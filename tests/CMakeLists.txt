@@ -19,9 +19,22 @@ if(NOT Catch2_FOUND)
 endif()
 
 set(TEST_SRCS
-	"lexer_test.cpp"
-	"parser_test.cpp"
-	"codegen_test.cpp"
+	"lexer/lexer_test.cpp"
+	"lexer/unop_test.cpp"
+	"lexer/mathop_test.cpp"
+	"lexer/cmpop_test.cpp"
+	"lexer/logicalop_test.cpp"
+	"parser/parser_test.cpp"
+	"parser/unop_test.cpp"
+	"parser/mathop_test.cpp"
+	"parser/cmpop_test.cpp"
+	"parser/logicalop_test.cpp"
+	"parser/invalid_test.cpp"
+	"codegen/codegen_test.cpp"
+	"codegen/mathop_test.cpp"
+	"codegen/unop_test.cpp"
+	"codegen/cmpop_test.cpp"
+	"codegen/logicalop_test.cpp"
 	"catch_main.cpp")
 
 set(TESTS_NAME "${PROJECT_NAME}_tests")	

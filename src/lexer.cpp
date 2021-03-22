@@ -37,19 +37,21 @@ template <typename Iter> std::optional<Operators> lettersToOp(Iter &letters) {
     return Operators::Multiply;
   case '/':
     return Operators::Divide;
+  case '%':
+    return Operators::Modulo;
   case '&':
     if (*std::next(letters) == '&') {
       ++letters;
       return Operators::LogicalAnd;
     } else {
-      return {};
+      return Operators::BitwiseAnd;
     }
   case '|':
     if (*std::next(letters) == '|') {
       ++letters;
       return Operators::LogicalOr;
     } else {
-      return {};
+      return Operators::BitwiseOr;
     }
   case '=':
     if (*std::next(letters) == '=') {
