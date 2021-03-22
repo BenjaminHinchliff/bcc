@@ -40,14 +40,14 @@ template <typename Iter> std::optional<Operators> lettersToOp(Iter &letters) {
   case '&':
     if (*std::next(letters) == '&') {
       ++letters;
-      return Operators::And;
+      return Operators::LogicalAnd;
     } else {
       return {};
     }
   case '|':
     if (*std::next(letters) == '|') {
       ++letters;
-      return Operators::Or;
+      return Operators::LogicalOr;
     } else {
       return {};
     }

@@ -103,7 +103,7 @@ void codegenExpr(std::ostream &out, const Expr &expr, size_t &labelCounter) {
               baseCmpOpCodegen(out, binOp, labelCounter);
               out << "\tsetle\t%al\n";
               break;
-            case BinaryOperator::Kind::Or: {
+            case BinaryOperator::Kind::LogicalOr: {
               codegenExpr(out, *binOp.getLhs(), labelCounter);
               out << "\tcmp\t$0, %rax\n";
               const std::string rightClause{makeLabel(labelCounter++)};
@@ -118,7 +118,7 @@ void codegenExpr(std::ostream &out, const Expr &expr, size_t &labelCounter) {
               out << "\tsetne\t%al\n";
               out << endClause << ":\n";
             } break;
-            case BinaryOperator::Kind::And: {
+            case BinaryOperator::Kind::LogicalAnd: {
               codegenExpr(out, *binOp.getLhs(), labelCounter);
               out << "\tcmp\t$0, %rax\n";
               const std::string rightClause{makeLabel(labelCounter++)};

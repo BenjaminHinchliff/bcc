@@ -59,8 +59,16 @@ const std::unordered_map<tokens::Operators, BinaryOperator::Kind>
         {tokens::Operators::Minus, BinaryOperator::Kind::Subtraction},
         {tokens::Operators::Multiply, BinaryOperator::Kind::Multiplication},
         {tokens::Operators::Divide, BinaryOperator::Kind::Division},
-        {tokens::Operators::And, BinaryOperator::Kind::And},
-        {tokens::Operators::Or, BinaryOperator::Kind::Or},
+        {tokens::Operators::Modulo, BinaryOperator::Kind::Modulo},
+        {tokens::Operators::LogicalAnd, BinaryOperator::Kind::LogicalAnd},
+        {tokens::Operators::LogicalOr, BinaryOperator::Kind::LogicalOr},
+        {tokens::Operators::BitwiseAnd, BinaryOperator::Kind::BitwiseAnd},
+        {tokens::Operators::BitwiseOr, BinaryOperator::Kind::BitwiseOr},
+        {tokens::Operators::BitwiseXor, BinaryOperator::Kind::BitwiseXor},
+        {tokens::Operators::BitwiseLeftShift,
+         BinaryOperator::Kind::BitwiseLeftShift},
+        {tokens::Operators::BitwiseRightShift,
+         BinaryOperator::Kind::BitwiseRightShift},
         {tokens::Operators::Equal, BinaryOperator::Kind::Equal},
         {tokens::Operators::NotEqual, BinaryOperator::Kind::NotEqual},
         {tokens::Operators::LessThan, BinaryOperator::Kind::LessThan},
@@ -76,18 +84,22 @@ bool canBeUnary(const tokens::Operators &op) {
 }
 
 const std::unordered_map<tokens::Operators, int> BINARY_OP_PREC{
-    {tokens::Operators::Or, 0},
-    {tokens::Operators::And, 1},
-    {tokens::Operators::Equal, 2},
-    {tokens::Operators::NotEqual, 2},
-    {tokens::Operators::LessThan, 3},
-    {tokens::Operators::LessThanOrEqual, 3},
-    {tokens::Operators::GreaterThan, 3},
-    {tokens::Operators::GreaterThanOrEqual, 3},
-    {tokens::Operators::Add, 4},
-    {tokens::Operators::Minus, 4},
-    {tokens::Operators::Multiply, 5},
-    {tokens::Operators::Divide, 5}};
+    {tokens::Operators::LogicalOr, 0},
+    {tokens::Operators::LogicalAnd, 1},
+    {tokens::Operators::BitwiseOr, 2},
+    {tokens::Operators::BitwiseXor, 3},
+    {tokens::Operators::BitwiseAnd, 4},
+    {tokens::Operators::Equal, 5},
+    {tokens::Operators::NotEqual, 5},
+    {tokens::Operators::LessThan, 6},
+    {tokens::Operators::LessThanOrEqual, 6},
+    {tokens::Operators::GreaterThan, 6},
+    {tokens::Operators::GreaterThanOrEqual, 6},
+    {tokens::Operators::Add, 7},
+    {tokens::Operators::Minus, 7},
+    {tokens::Operators::Multiply, 8},
+    {tokens::Operators::Divide, 8},
+    {tokens::Operators::Modulo, 8}};
 
 std::unique_ptr<Expr> parseFactor(Tokens::const_iterator &it);
 

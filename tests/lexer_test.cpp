@@ -95,7 +95,7 @@ int main() {
   using namespace bcc::tokens;
   std::vector<Token> target{
       TypeKeyword::Int, Identifier{"main"}, OpenParen{},  CloseParen{},
-      OpenBrace{},      Keyword::Return,    Int{1},       Operators::And,
+      OpenBrace{},      Keyword::Return,    Int{1},       Operators::LogicalAnd,
       Int{0},           Semicolon{},        CloseBrace{},
   };
   REQUIRE(tokens == target);
@@ -111,7 +111,7 @@ int main() {
   using namespace bcc::tokens;
   std::vector<Token> target{
       TypeKeyword::Int, Identifier{"main"}, OpenParen{},  CloseParen{},
-      OpenBrace{},      Keyword::Return,    Int{1},       Operators::Or,
+      OpenBrace{},      Keyword::Return,    Int{1},       Operators::LogicalOr,
       Int{0},           Semicolon{},        CloseBrace{},
   };
   REQUIRE(tokens == target);

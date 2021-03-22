@@ -85,10 +85,10 @@ void BinaryOperator::print(std::ostream &out, size_t indent) const {
   case Kind::Division:
     out << "Division";
     break;
-  case Kind::And:
+  case Kind::LogicalAnd:
     out << "And";
     break;
-  case Kind::Or:
+  case Kind::LogicalOr:
     out << "Or";
     break;
   case Kind::Equal:

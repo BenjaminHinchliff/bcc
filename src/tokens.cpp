@@ -69,10 +69,10 @@ std::ostream& operator<<(std::ostream& out, const Operators& tok) {
   case Operators::Divide:
     out << "Divide";
     break;
-  case Operators::And:
+  case Operators::LogicalAnd:
     out << "And";
     break;
-  case Operators::Or:
+  case Operators::LogicalOr:
     out << "Or";
     break;
   case Operators::Equal:

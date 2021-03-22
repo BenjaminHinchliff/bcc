@@ -188,7 +188,7 @@ int main() {
   Program target(
       "main",
       std::make_unique<Stmt>(Return(std::make_unique<Expr>(BinaryOperator(
-          BinaryOperator::Kind::And, std::make_unique<Expr>(Constant(1)),
+          BinaryOperator::Kind::LogicalAnd, std::make_unique<Expr>(Constant(1)),
           std::make_unique<Expr>(Constant(0)))))));
   REQUIRE(ast == target);
 }
@@ -204,7 +204,7 @@ int main() {
   Program target(
       "main",
       std::make_unique<Stmt>(Return(std::make_unique<Expr>(BinaryOperator(
-          BinaryOperator::Kind::Or, std::make_unique<Expr>(Constant(1)),
+          BinaryOperator::Kind::LogicalOr, std::make_unique<Expr>(Constant(1)),
           std::make_unique<Expr>(Constant(0)))))));
   REQUIRE(ast == target);
 }
