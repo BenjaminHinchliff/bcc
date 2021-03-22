@@ -116,6 +116,7 @@ int main() {
                      "\tpop\t%rax\n"
                      "\tcqo\n"
                      "\tidiv\t%rcx\n"
+                     "\tmov\t%rdx, %rax\n"
                      "\tret\n");
 #ifdef _WIN32
   target.insert(0, "\t.def\tmain;\n");

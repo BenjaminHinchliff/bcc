@@ -12,7 +12,10 @@ int main() {
   auto ast = bcc::parser::parse(source);
   std::stringstream ss;
   bcc::codegen::codegen(ss, ast);
-  std::string target("\t.globl\tmain\nmain:\n\tmov\t$2, %rax\n\tret\n");
+  std::string target("\t.globl\tmain\n"
+                     "main:\n"
+                     "\tmov\t$2, %rax\n"
+                     "\tret\n");
 #ifdef _WIN32
   target.insert(0, "\t.def\tmain;\n");
 #endif // _WIN32

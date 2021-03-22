@@ -77,6 +77,12 @@ void codegenExpr(std::ostream &out, const Expr &expr, size_t &labelCounter) {
               out << "\tcqo\n";
               out << "\tidiv\t%rcx\n";
               break;
+            case BinaryOperator::Kind::Modulo:
+              baseMathOpCodegen(out, binOp, labelCounter, true);
+              out << "\tcqo\n";
+              out << "\tidiv\t%rcx\n";
+              out << "\tmov\t%rdx, %rax\n";
+              break;
             case BinaryOperator::Kind::Equal:
               baseMathOpCodegen(out, binOp, labelCounter);
               out << "\tcmp\t%rax, %rcx\n";
