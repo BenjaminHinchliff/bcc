@@ -3,15 +3,23 @@
 #include <iostream>
 #include <sstream>
 
+#include <CLI/App.hpp>
+#include <CLI/Formatter.hpp>
+#include <CLI/Config.hpp>
 #include <bcc/bcc.hpp>
 
 int main(int argc, char **argv) {
-  if (argc < 2) {
-    std::cerr << "no input file specified" << '\n';
-    return 1;
-  }
+  CLI::App app{"A Small and Simple C Compiler for Windows and Linux"};
 
-  std::string inputPath = argv[1];
+  std::string inputPath;
+  app.add_option("input-path", inputPath, "the path to the input file")->required();
+  bool dump_tokens = false;
+  app.add_flag("-t,--tokens", dump_tokens, "dump tokens to stderr");
+  bool dump_ast = false;
+  app.add_flag("-a,--ast", dump_ast, "dump ast to stderr");
+
+  CLI11_PARSE(app, argc, argv);
+
   std::string inputBase = inputPath.substr(0, inputPath.rfind("."));
   std::string outputPath = inputBase + ".s";
 
@@ -20,6 +28,11 @@ int main(int argc, char **argv) {
   inputStrStream << inputFile.rdbuf();
   auto tokens = bcc::lexer::lex(inputStrStream.str());
 
+  if (dump_tokens) {
+    std::cerr << "Tokens:\n";
+    std::cerr << tokens << '\n';
+  }
+
   std::unique_ptr<bcc::ast::Program> program;
   try {
     program = std::make_unique<bcc::ast::Program>(bcc::parser::parseTokens(tokens));
@@ -27,6 +40,11 @@ int main(int argc, char **argv) {
     std::cerr << "Parsing error:\n";
     std::cerr << '\t' << e.what() << '\n';
     return 1;
+  }
+
+  if (dump_ast) {
+    std::cerr << "Ast:\n";
+    std::cerr << *program << '\n';
   }
 
   std::ofstream outputFile(outputPath);
